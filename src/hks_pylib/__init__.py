@@ -7,6 +7,7 @@ This is huykingsofm's python library, including:
 """
 
 import hks_pylib.cipher as _cipher
+from hks_pylib.version import __version__
 
 _cipher.AllCipher.register(_cipher.NoCipher)
 _cipher.AllCipher.register(_cipher.XorCipher)
