@@ -41,12 +41,22 @@ $ path/to/your/venv/Scripts/activate.bat
 Just use `import` statement and enjoy it. We will write documentations and tutorials as soon as possible so that you can understand our library easier.
 
 ```python
-from hks_pylib.done import Done  # A Done object can be used to substitute complexity return value
+# A Done object can be used to substitute 
+# complexity return value
+from hks_pylib.done import Done
 
-from hks_pylib.logger import StandardLogger  # A class is used to print/write logs console/file
-from hks_pylib.logger import StandardLoggerGenerator  # A class is used to generate StandardLogger objects. You should use this class instead of using StandardLogger directly
+# A class is used to print/write 
+# logs console/file
+from hks_pylib.logger import StandardLogger  
 
-from hks_pylib.cipher import NoCipher, AES_CBC, SimpleSSL  # Some common ciphers
+# A class is used to generate StandardLogger objects.
+# You should use this class instead of 
+# using StandardLogger directly
+from hks_pylib.logger import StandardLoggerGenerator  
 
-from hks_pylib.http import HTTPReader, HTTPWriter  # You can create or read raw http packets with these class
+# Some common ciphers
+from hks_pylib.cipher import NoCipher, AES_CBC, SimpleSSL 
+ 
+# You can create or read raw http packets with these class
+from hks_pylib.http import HTTPReader, HTTPWriter  
 ```
