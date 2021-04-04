@@ -14,7 +14,7 @@ Our module only supports Python 3 and we just test it on Python 3.7.1. If you me
 You should create a virtual enviroment to avoid conflicting with other applications on your machine when installing our module. The virtual enviroment must be installed with [Python 3](https://www.python.org/downloads).  
 I highly recommend you to use [Anaconda](https://www.anaconda.com/products/individual) because of its utilities. The command of creating virtual enviroment in Anaconda is:
 ```bash
-$ conda create -n your_venv_name python=>=3
+$ conda create -n your_venv_name
 $ conda activate your_venv_name
 (your_venv_name) $ _ 
 ```
