@@ -1,9 +1,9 @@
 # hks_lib
-This is huykingsofm's python library, including:
-- `logger`: A module is used to print notifications to console screen or write logs to file. It is special because you can disable the print/write statement by modifying few parameters without having to delete or comment them. 
-- `cipher`: A very simple crypto module bases on [cryptography](https://pypi.org/project/cryptography/). It is easier to use than original one.
-- `done`: A module defines a class (`Done`) for returning complex values easier.
-- `http`: A module is used to read and generate raw http packets.
+This is huykingsofm's Python 3 utility library, including some modules:
+- `logger`: A module is used to print notifications to console screen or write logs to file. It is special because you can disable the print/write statement by modifying few parameters without having to delete or comment them manually. 
+- `cipher`: A very simple crypto module based on [cryptography](https://pypi.org/project/cryptography/). It is easier to use than the original one.
+- `done`: A module defines a class (`Done`) for returning complex values more easily.
+- `http`: A module is used to read and create raw http packets.
 
 # How to build
 Our module only supports Python 3 and we just test it on Python 3.7.1. If you meet any problems, even if with other versions, let you [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quick as possible.  
@@ -26,15 +26,18 @@ $ path/to/your/venv/Scripts/activate.bat
 (your_venv_name) $ _
 ```
 
-## Method 1: Install the most stable version
+## Method 1: Install the PyPI version (not completed yet)
 ```bash
 (your_venv_name) $ pip install hks_pylib
 ```
 
-## Method 2: Install the newest version
+## Method 2: Install the newest version (recommendation)
 
 ```bash
-(your_venv_name) $ pip install -e .
+
+(your_venv_name) $ git clone https://github.com/huykingsofm/hks_pylib.git
+(your_venv_name) $ cd hks_pylib
+(your_venv_name) hks_pylib $ pip install -e .
 ```
 
 # How to use
@@ -42,11 +45,11 @@ Just use `import` statement and enjoy it. We will write documentations and tutor
 
 ```python
 # A Done object can be used to substitute 
-# complex return value
+# complex return values
 from hks_pylib.done import Done
 
 # A class is used to print/write 
-# logs console/file
+# logs to console/file
 from hks_pylib.logger import StandardLogger  
 
 # A class is used to generate StandardLogger objects.
