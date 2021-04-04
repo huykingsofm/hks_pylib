@@ -6,15 +6,15 @@ This is huykingsofm's python library, including:
 - `http`: A module is used to read and generate raw http packets.
 
 # How to build
-We are assuming that your code is running on the Python 3.7.1. If you meet any problems, even if with other versions, let [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quick as possible.  
+Our module only supports Python 3 and we just test it on Python 3.7.1. If you meet any problems, even if with other versions, let you [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quick as possible.  
 
 ## Create Virtual Enviroment (optional but IMPORTANT)
 *If you had your own virtual enviroment, you can ignore this step.* 
 
-You should create a virtual enviroment to avoid conflicting with other applications on your machine when installing our module. The virtual enviroment should be installed with [Python 3.7.1](https://www.python.org/downloads/release/python-371/) (you can use other Python versions but we can't ensure that unexpected errors will not appear suddenly).  
+You should create a virtual enviroment to avoid conflicting with other applications on your machine when installing our module. The virtual enviroment must be installed with [Python 3](https://www.python.org/downloads).  
 I highly recommend you to use [Anaconda](https://www.anaconda.com/products/individual) because of its utilities. The command of creating virtual enviroment in Anaconda is:
 ```bash
-$ conda create -n your_venv_name python=3.7.1
+$ conda create -n your_venv_name python=>=3
 $ conda activate your_venv_name
 (your_venv_name) $ _ 
 ```
