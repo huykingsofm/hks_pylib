@@ -2,7 +2,7 @@ import pytest
 from hks_pylib.done import Done
 
 
-def test():
+def test_done():
     done1 = Done(True, author="huykingsofm")
     done2 = Done(False, author="hks")
     done2.copy(done1, True)

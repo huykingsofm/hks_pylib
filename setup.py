@@ -23,7 +23,7 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires=">=3.7.1",
+    python_requires=">=3",
     install_requires=["cryptography==3.4.7"],
     setup_requires=["pytest-runner==4.4"],
     tests_require=["pytest==4.4.1"],

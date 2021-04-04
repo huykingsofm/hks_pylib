@@ -2,7 +2,7 @@
 This is huykingsofm's python library, including:
 - `logger`: A module is used to print notifications to console screen or write logs to file. It is special because you can disable the print/write statement by modifying few parameters without having to delete or comment them. 
 - `cipher`: A very simple crypto module bases on [cryptography](https://pypi.org/project/cryptography/). It is easier to use than original one.
-- `done`: A module defines a class (`Done`) for returning complexity values easier.
+- `done`: A module defines a class (`Done`) for returning complex values easier.
 - `http`: A module is used to read and generate raw http packets.
 
 # How to build
@@ -12,7 +12,7 @@ We are assuming that your code is running on the Python 3.7.1. If you meet any p
 *If you had your own virtual enviroment, you can ignore this step.* 
 
 You should create a virtual enviroment to avoid conflicting with other applications on your machine when installing our module. The virtual enviroment should be installed with [Python 3.7.1](https://www.python.org/downloads/release/python-371/) (you can use other Python versions but we can't ensure that unexpected errors will not appear suddenly).  
-I highly recommend you to use [Anaconda](https://www.anaconda.com/products/individual) because its utilities. The command of creating virtual enviroment in Anaconda is:
+I highly recommend you to use [Anaconda](https://www.anaconda.com/products/individual) because of its utilities. The command of creating virtual enviroment in Anaconda is:
 ```bash
 $ conda create -n your_venv_name python=3.7.1
 $ conda activate your_venv_name
@@ -34,7 +34,6 @@ $ path/to/your/venv/Scripts/activate.bat
 ## Method 2: Install the newest version
 
 ```bash
-(your_venv_name) $ pip install -r requirements.txt
 (your_venv_name) $ pip install -e .
 ```
 
@@ -43,7 +42,7 @@ Just use `import` statement and enjoy it. We will write documentations and tutor
 
 ```python
 # A Done object can be used to substitute 
-# complexity return value
+# complex return value
 from hks_pylib.done import Done
 
 # A class is used to print/write 
