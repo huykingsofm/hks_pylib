@@ -1,12 +1,12 @@
-# hks_lib
-This is huykingsofm's Python 3 utility library, including some modules:
+# hks_pylib
+This is a Python 3 utility library of [huykingsofm](https://github.com/huykingsofm). It has some modules, including:
 - `logger`: A module is used to print notifications to console screen or write logs to file. It is special because you can disable the print/write statement by modifying few parameters without having to delete or comment them manually. 
 - `cipher`: A very simple crypto module based on [cryptography](https://pypi.org/project/cryptography/). It is easier to use than the original one.
-- `done`: A module defines a class (`Done`) for returning complex values more easily.
-- `http`: A module is used to read and create raw http packets.
+- `done`: A module defines a class (`Done`) for returning complex values more convenient.
+- `http`: A module is used to parse or generate raw http packets.
 
 # How to build
-Our module only supports Python 3 and we just test it on Python 3.7.1. If you meet any problems, even if with other versions, let you [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quick as possible.  
+Our library is only supported by Python 3 and we just test it on Python 3.7.1. If you meet any problems, even if with other versions, let you [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quick as possible.  
 
 ## Create Virtual Enviroment (optional but IMPORTANT)
 *If you had your own virtual enviroment, you can ignore this step.* 
@@ -60,6 +60,6 @@ from hks_pylib.logger import StandardLoggerGenerator
 # Some common ciphers
 from hks_pylib.cipher import NoCipher, AES_CBC, SimpleSSL 
 
-# You can create or read raw http packets with these class
-from hks_pylib.http import HTTPReader, HTTPWriter  
+# You can parse or generate raw http packets with these class
+from hks_pylib.http import HTTPParser, HTTPGenerator  
 ```

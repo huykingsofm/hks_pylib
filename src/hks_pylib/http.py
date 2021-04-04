@@ -1,11 +1,11 @@
-class HTTPReader(object):
+class HTTPParser(object):
     def __init__(self):
         self.__type = None
         self.__start_line = {}
         self.__header = {}
         self.__body = None
 
-    def read(self, packet: bytes):
+    def parse(self, packet: bytes):
         assert isinstance(packet, (bytes, bytearray))
 
         header, self.__body = packet.split(b"\r\n\r\n")
@@ -46,7 +46,7 @@ class HTTPReader(object):
         return self.__body
 
 
-class HTTPWriter(object):
+class HTTPGenerator(object):
     def __init__(self):
         self.__type = None
         self.__start_line = {}
