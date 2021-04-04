@@ -1,18 +1,18 @@
 # hks_pylib
 This is a Python 3 utility library of [huykingsofm](https://github.com/huykingsofm). It has some modules, including:
-- `logger`: A module is used to print notifications to console screen or write logs to file. It is special because you can disable the print/write statement by modifying few parameters without having to delete or comment them manually. 
+- `logger`: A module is used to print notifications to the console screen or write logs to file. It is special because you can disable the print/write statement by modifying few parameters without having to delete or comment them manually. 
 - `cipher`: A very simple crypto module based on [cryptography](https://pypi.org/project/cryptography/). It is easier to use than the original one.
-- `done`: A module defines a class (`Done`) for returning complex values more convenient.
+- `done`: A module defines a class (`Done`) for returning complex values more conveniently.
 - `http`: A module is used to parse or generate raw http packets.
 
 # How to build
-Our library is only supported by Python 3 and we just test it on Python 3.7.1. If you meet any problems, even if with other versions, let you [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quick as possible.  
+Our library is only supported by Python 3. Now we test it only on Python 3.7.1. If you meet any problems, even if with other versions, you could [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quickly as possible.  
 
-## Create Virtual Enviroment (optional but IMPORTANT)
-*If you had your own virtual enviroment, you can ignore this step.* 
+## Create Virtual Environment (optional but IMPORTANT)
+*If you had your virtual environment, you can ignore this step.* 
 
-You should create a virtual enviroment to avoid conflicting with other applications on your machine when installing our module. The virtual enviroment must be installed with [Python 3](https://www.python.org/downloads).  
-I highly recommend you to use [Anaconda](https://www.anaconda.com/products/individual) because of its utilities. The command of creating virtual enviroment in Anaconda is:
+You ought to create a virtual environment to avoid conflicting with other applications on your machine when installing our module. The virtual environment must be installed with [Python 3](https://www.python.org/downloads).  
+I highly recommend you to use [Anaconda](https://www.anaconda.com/products/individual) because of its utilities. The command of creating a virtual environment in Anaconda is:
 ```bash
 $ conda create -n your_venv_name
 $ conda activate your_venv_name
@@ -41,7 +41,7 @@ $ path/to/your/venv/Scripts/activate.bat
 ```
 
 # How to use
-Just use `import` statement and enjoy it. We will write documentations and tutorials as soon as possible so that you can understand our library easier.
+Just use `import` statement and enjoy it. We will write documentation and tutorials as soon as possible so that you can understand our library easier.
 
 ```python
 # A Done object can be used to substitute 

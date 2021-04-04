@@ -5,8 +5,8 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="hks_pylib", # Replace with your own username
-    version="0.0.2",
+    name="hks_pylib",
+    version="0.0.3",
     author="huykingsofm",
     author_email="huykingsofm@gmail.com",
     description="A python utility library is written by huykingsofm",
