@@ -7,7 +7,7 @@ A Python 3 utility library of [huykingsofm](https://github.com/huykingsofm). It 
 - `math`: A module implements some no-builtin mathematic operations.
 
 # How to build
-Our library is only supported by Python 3. Now we test it only on Python 3.7.1. If you meet any problems, even if with other versions, you could [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quickly as possible.  
+Our library is only supported by Python>=3.7.1. Now we test it only on Python 3.7.1. If you meet any problems, even if with other versions, you could [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quickly as possible.  
 
 ## Create Virtual Environment (optional but IMPORTANT)
 *If you had your virtual environment, you can ignore this step.* 

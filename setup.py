@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="hks_pylib-huykingsofm",
+    name="hks_pylib",
     version="0.0.4",
     author="huykingsofm",
     author_email="huykingsofm@gmail.com",
@@ -23,7 +23,7 @@ setuptools.setup(
     ],
     package_dir={"": "src"},
     packages=setuptools.find_packages(where="src"),
-    python_requires=">=3",
+    python_requires=">=3.7.1",
     install_requires=["cryptography==3.4.7"],
     setup_requires=["pytest-runner==4.4"],
     tests_require=["pytest==4.4.1", "pytest-benchmark"],
