@@ -1,4 +1,3 @@
-import pytest
 from hks_pylib.done import Done
 
 

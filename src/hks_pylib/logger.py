@@ -58,6 +58,10 @@ class BaseLogger(object):
         for user in self._display:
             if user not in self._config:
                 raise Exception(f"Displayed user must be in {self._config.user()}, rather than {user}")
+            
+            if self._display[user] == ["ALL"]:
+                continue
+            
             for level in self._display[user]:
                 if level not in self._config.level(user):
                     raise Exception(
@@ -75,7 +79,7 @@ class BaseLogger(object):
         if user not in self._display:
             return
 
-        if level not in self._display[user]:
+        if self._display[user] != ["ALL"] and level not in self._display[user]:
             return
 
         self._config.lock.acquire()
