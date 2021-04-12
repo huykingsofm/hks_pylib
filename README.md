@@ -27,12 +27,12 @@ $ path/to/your/venv/Scripts/activate.bat
 (your_venv_name) $ _
 ```
 
-## Method 1: Install the stablest PyPI version
+## Method 1: Install the stablest version (PyPI)
 ```bash
 (your_venv_name) $ pip install hks_pylib
 ```
 
-## Method 2: Install the newest version
+## Method 2: Install the newest version (Github)
 
 ```bash
 (your_venv_name) $ git clone https://github.com/huykingsofm/hks_pylib.git
