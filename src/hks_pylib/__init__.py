@@ -19,9 +19,3 @@ more conveniently.
 """
 
 from hks_pylib.version import __version__
-
-
-def as_object(*args, **kwargs):
-    def _to_obj(cls):
-        return cls(*args, **kwargs)
-    return _to_obj

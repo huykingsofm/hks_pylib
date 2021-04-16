@@ -1,6 +1,6 @@
-from cryptography.hazmat import primitives
-from hks_pylib.cryptography._cipher import HKSCipher
+from hks_pylib.cryptography.ciphers import HKSCipher
 from hks_pylib.cryptography.hashes import SHA1, SHA256, HKSHash
+from hks_pylib.errors import ExistedCipherIDError, InvalidParameterError
 
 __default_sha1 = SHA1()
 __default_sha256 = SHA256()
@@ -34,8 +34,11 @@ class CipherID(object):
 
     @staticmethod
     def register(cipher_cls):
-        assert issubclass(cipher_cls, HKSCipher)
-        assert hash_cls_name(cipher_cls) not in CipherID._cipher_hashs.keys()
+        if not issubclass(cipher_cls, HKSCipher):
+            raise InvalidParameterError("Parameter cipher_cls must be a subclass of HKSCipher.")
+
+        if hash_cls_name(cipher_cls) in CipherID._cipher_hashs.keys():
+            raise ExistedCipherIDError()
 
         CipherID._cipher_hashs[hash_cls_name(cipher_cls)] = cipher_cls
         CipherID._cipher_names[cipher_cls.__name__] = cipher_cls

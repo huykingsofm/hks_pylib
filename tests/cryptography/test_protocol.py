@@ -14,3 +14,8 @@ def test_DHE():
     sk2 = P2.derive_key(sk2, 32)
 
     assert sk1 == sk2
+    try:
+        sk1 = P1.exchange(pk2)
+        assert False
+    except:
+        pass

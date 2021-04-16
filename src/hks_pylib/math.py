@@ -1,4 +1,4 @@
-from typing import Tuple
+from hks_pylib.errors import InvalidParameterError
 
 
 def ceil_div(a, b):
@@ -6,8 +6,11 @@ def ceil_div(a, b):
 
 
 def bxor(A: bytes, B: bytes):
-    assert isinstance(A, bytes) and isinstance(B, bytes)
-    assert len(A) == len(B)
+    if not isinstance(A, bytes) or not isinstance(B, bytes):
+        raise InvalidParameterError("Parameter A and B must be bytes objects.")
+
+    if len(A) != len(B):
+        raise InvalidParameterError("Parameter A and B must be the same size.")
 
     iA = int.from_bytes(A, "big")
     iB = int.from_bytes(B, "big")

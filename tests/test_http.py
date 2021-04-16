@@ -14,7 +14,7 @@ def test_read_http(packet):
 
 def write_http():
     a = http.HTTPGenerator()
-    a.type = "RESPONSE"
+    a.type = http.HTTPType.RESPONSE
     a.set_start_line(protocol_version="HTTP/1.1", status_code="200", status_text="OK")
     a.add_header("Agent", "LeuLeu")
     return a.generate()

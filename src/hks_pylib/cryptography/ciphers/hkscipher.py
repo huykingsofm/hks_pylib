@@ -1,6 +1,15 @@
 from typing import Any
 
 
+from hks_pylib.hksenum import HKSEnum
+
+
+class CipherProcess(HKSEnum):
+    ENCRYPT = "Encrypt"
+    DECRYPT = "Decrypt"
+    FINALIZED = "Finalized"
+    NONE = "None"
+
 class HKSCipher(object):
     "Abstract class: NEVER USE"
     def __init__(self, key: Any = None, number_of_params: int = 0):

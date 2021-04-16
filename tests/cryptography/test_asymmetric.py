@@ -1,7 +1,7 @@
 import os
 import time
 import random
-from hks_pylib.cryptography.asymmetrics import RSACipher, RSAKey
+from hks_pylib.cryptography.ciphers.asymmetrics import RSACipher, RSAKey
 
 
 def run_RSA():

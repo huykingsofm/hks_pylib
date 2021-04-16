@@ -1,13 +1,13 @@
 import os
 import random
-from cryptography.hazmat.primitives import ciphers
 import pytest
 
 from cryptography.hazmat.primitives.ciphers.algorithms import AES
 
 from hks_pylib import math
-from hks_pylib.cryptography._cipher import HKSCipher
-from hks_pylib.cryptography.symmetrics import XorCipher, NoCipher, AES_CBC, AES_CTR, HybridCipher
+from hks_pylib.cryptography.ciphers import HKSCipher
+from hks_pylib.cryptography.ciphers.symmetrics import XorCipher, NoCipher
+from hks_pylib.cryptography.ciphers.symmetrics import AES_CBC, AES_CTR, HybridCipher
 
 
 AES_KEY = b"0123456789abcdeffedcba9876543210"
