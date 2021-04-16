@@ -5,6 +5,7 @@ A Python 3 utility library of [huykingsofm](https://github.com/huykingsofm). It 
 - `done`: A module defines a class (`Done`) for returning complex values more conveniently.
 - `http`: A module is used to parse or generate raw HTTP packets.
 - `math`: A module implements some no-builtin mathematic operations.
+- `hksenum`: A wrapper module of `Enum` is more convenient.
 
 # How to build
 Our library is only supported by Python>=3.7.1. Now we test it only on Python 3.7.1. If you meet any problems, even if with other versions, you could [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quickly as possible.  
@@ -47,6 +48,7 @@ Just use `import` statement and enjoy it. We will write documentation and tutori
 # A Done object can be used to substitute 
 # complex return values
 from hks_pylib.done import Done
+# Example: return Done(True, reason="OK")
 
 # A class is used to print/write 
 # logs to console/file
@@ -55,11 +57,24 @@ from hks_pylib.logger import StandardLogger
 # A class is used to generate StandardLogger objects.
 # You should use this class instead of 
 # using StandardLogger directly
-from hks_pylib.logger import StandardLoggerGenerator  
+from hks_pylib.logger import StandardLoggerGenerator
+
+# You may use our console_output instead of print builtin function
+# in a multithread program
+from hks_pylib.logger import console_output
+console_output.write("Something", auto_avoid_conflict = True)
 
 # Some common ciphers
 from hks_pylib.cipher import NoCipher, AES_CBC, SimpleSSL 
 
 # You can parse or generate raw HTTP packets with these class
 from hks_pylib.http import HTTPParser, HTTPGenerator  
+
+# You can encrypt or decrypt your data with our cryptography module
+from hks_pylib.cryptography.ciphers.symmetrics import AES_CTR, AES_CBC
+from hks_pylib.cryptography.ciphers.asymmetrics import RSAKey, RSACipher
+# or hash functions
+from hks_pylib.cryptography.hashes import SHA1, SHA256
+# or Diffie Hellman
+from hks_pylib.cryptography.protocols import DiffieHellmanExchange
 ```

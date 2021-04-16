@@ -27,10 +27,16 @@ class ConsoleOutput(Output):
                 sep: Optional[str] = " ",
                 end: Optional[str] = "\n",
                 file = sys.stdout,
-                flush: bool = False
+                flush: bool = False,
+                auto_avoid_conflict: bool = False
             ) -> None:
+        if auto_avoid_conflict:
+            self.open()
+
         print(*values, sep=sep, end=end, file=file, flush=flush)
 
+        if auto_avoid_conflict:
+            self.close()
 
 console_output = ConsoleOutput()
 
