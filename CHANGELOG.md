@@ -6,4 +6,4 @@
 + Change many constants to `HKSEnum` type.
 + Divide module `ciphers` into multiple submodules and move them to folder `ciphers/`.
 + Divide module `logger` into multiple submodules and move them to folder `logger/`.
-+ Remove `requirement.txt`.
++ Remove `requirements.txt`.
