@@ -90,3 +90,21 @@ class UnAuthenticatedPacketError(CryptographyError):
 
 class NotEnoughCipherParameterError(CryptographyError):
     "Exception is raised when you has not yet passed enough paramters to a cipher."
+
+class InvalidBitsLengthError(MathError):
+    "Exception is raised when you access invalid range of bits."
+
+class BatchCryptError(CryptographyError):
+    "Exception is raised by failures in batchcrypt module."
+
+class InvalidElementError(BatchCryptError):
+    "Exception is raised when you access an invalid element in batchnumber."
+
+class NotSetRangeOfQuantizer(BatchCryptError):
+    "Exception is raised if you don't provide enough range."
+
+class OutOfRangeQuantizerError(BatchCryptError):
+    "Exception is raised when you pass a value out of range in quantizer."
+
+class NotCompileQuatizerError(BatchCryptError):
+    "Exception is raised when you quantize without compiling."

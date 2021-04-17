@@ -7,3 +7,5 @@
 + Divide module `ciphers` into multiple submodules and move them to folder `ciphers/`.
 + Divide module `logger` into multiple submodules and move them to folder `logger/`.
 + Remove `requirements.txt`.
++ Add `Bitwise` operator to `math`.
++ Add `batchcrypt` module to `cryptography`.

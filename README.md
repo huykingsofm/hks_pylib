@@ -5,7 +5,7 @@ A Python 3 utility library of [huykingsofm](https://github.com/huykingsofm). It 
 - `done`: A module defines a class (`Done`) for returning complex values more conveniently.
 - `http`: A module is used to parse or generate raw HTTP packets.
 - `math`: A module implements some no-builtin mathematic operations.
-- `hksenum`: A wrapper module of `Enum` is more convenient.
+- `hksenum`: A wrapper module of `Enum` is more convenient than the original.
 
 # How to build
 Our library is only supported by Python>=3.7.1. Now we test it only on Python 3.7.1. If you meet any problems, even if with other versions, you could [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quickly as possible.  
