@@ -27,10 +27,10 @@ class GenericQuantizer(object):
 
     def set_int_size(self, size_in_bit: int, signed: bool = False):
         if not isinstance(size_in_bit, int):
-            raise InvalidParameterError("Parameter size_int_bit must be a int.")
+            raise InvalidParameterError("Parameter size_in_bit must be an int.")
         
         if size_in_bit <= 0:
-            raise InvalidParameterError("Parameter size_in_bit must be a "
+            raise InvalidParameterError("Parameter size_in_bit must be an "
             "positive number.")
 
         if not signed:
@@ -76,7 +76,7 @@ class GenericQuantizer(object):
 
     def i2f(self, i: int, force: bool = False, n_cumulative: int = 1):
         if not isinstance(i, int):
-            raise InvalidParameterError("Parameter i must be a int.")
+            raise InvalidParameterError("Parameter i must be an int.")
         
         if not isinstance(n_cumulative, int) or n_cumulative < 1:
             raise InvalidParameterError("Parameter n_cummulative must be\

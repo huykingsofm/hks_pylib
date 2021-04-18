@@ -71,7 +71,7 @@ class Bitwise(object):
     def get_max_number(bit_length: int):
         if not isinstance(bit_length, int) or bit_length <= 0:
             raise InvalidParameterError("Parameter bit_length "
-            "must be a int and larger than 0");
+            "must be an int and larger than 0");
 
         return ~(1 << bit_length) + (1 << (bit_length + 1))
 

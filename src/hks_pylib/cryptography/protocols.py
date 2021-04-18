@@ -13,10 +13,10 @@ class DiffieHellmanExchange(object):
 
     def __init__(self, p: int = None, g: int = None) -> None:
         if p is not None and not isinstance(p, int):
-            raise InvalidParameterError("Parameter p must be None or a int object.")
+            raise InvalidParameterError("Parameter p must be None or an int object.")
         
         if g is not None and not isinstance(g, int):
-            raise InvalidParameterError("Parameter g must be None or a int object.")
+            raise InvalidParameterError("Parameter g must be None or an int object.")
 
         if not p:
             p = DiffieHellmanExchange.DEFAULT_P
@@ -54,7 +54,7 @@ class DiffieHellmanExchange(object):
             raise InvalidParameterError("Parameter shared_key must be a bytes object.")
 
         if not isinstance(key_size, int):
-            raise InvalidParameterError("Parameter key_size must be a int.")
+            raise InvalidParameterError("Parameter key_size must be an int.")
 
         return HKDF(
             algorithm=hashes.SHA256(),
