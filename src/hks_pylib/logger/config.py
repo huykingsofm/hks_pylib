@@ -3,8 +3,8 @@ import threading
 from typing import Dict, Optional, Set
 
 from hks_pylib.errors import InvalidParameterError
-from hks_pylib.errors import ExistedLogConfigElementError
-from hks_pylib.errors import NotExistedLogConfigElementError
+from hks_pylib.errors.logger import ExistedLogConfigElementLoggerError
+from hks_pylib.errors.logger import NotExistedLogConfigElementLoggerError
 
 class Output(object):
     def __init__(self) -> None:
@@ -95,10 +95,12 @@ class LogConfig(object):
             raise InvalidParameterError("Parameter level must be a str.")
 
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementError("User {} does not exist.".format(user))
+            raise NotExistedLogConfigElementLoggerError("User {} does "
+            "not exist.".format(user))
 
         if level in self.__user_level[user]:
-            raise ExistedLogConfigElementError("Level {} has already existed.".format(level))
+            raise ExistedLogConfigElementLoggerError("Level {} has "
+            "already existed.".format(level))
 
         self.__user_level[user].add(level)
 
@@ -117,7 +119,8 @@ class LogConfig(object):
             raise InvalidParameterError("Paramter output must be an Output object.")
         
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementError("User {} does not exist.".format(user))
+            raise NotExistedLogConfigElementLoggerError("User {} does "
+            "not exist.".format(user))
         
         self.__user_output[user] = output
 
@@ -129,7 +132,8 @@ class LogConfig(object):
             raise InvalidParameterError("Paramter user must be a str.")
 
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementError("User {} does not exist.".format(user))
+            raise NotExistedLogConfigElementLoggerError("User {} does "
+            "not exist.".format(user))
 
         return self.__user_level[user]
 
@@ -138,6 +142,7 @@ class LogConfig(object):
             raise InvalidParameterError("Paramter user must be a str.")
 
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementError("User {} does not exist.".format(user))
+            raise NotExistedLogConfigElementLoggerError("User {} does "
+            "not exist.".format(user))
 
         return self.__user_output[user]

@@ -1,11 +1,12 @@
 import datetime
 
 from typing import Iterable
-from hks_pylib.errors import InvalidParameterError, NotExistedLogConfigElementError
 
 from hks_pylib.hksenum import HKSEnum
 from hks_pylib.logger.config import LogConfig, console_output, FileOutput
 
+from hks_pylib.errors import InvalidParameterError
+from hks_pylib.errors.logger import NotExistedLogConfigElementLoggerError
 
 class Display(HKSEnum):
     ALL = 0
@@ -25,8 +26,8 @@ class BaseLogger(object):
 
         for user in self._display:
             if user not in self._config.users():
-                raise NotExistedLogConfigElementError(f"Displayed user must be in "
-                    f"{self._config.users()}, rather than {user}.")
+                raise NotExistedLogConfigElementLoggerError(f"Displayed user "
+                f"must be in {self._config.users()}, rather than {user}.")
             
             if self._display[user] is not Display.ALL\
                 and not isinstance(self._display[user], Iterable):
@@ -38,17 +39,18 @@ class BaseLogger(object):
 
             for level in self._display[user]:
                 if level not in self._config.level(user):
-                    raise NotExistedLogConfigElementError(f"Displayed level of '{user}' "
-                    f"must be in the {self._config.level(user)}, rather than {level}.")
+                    raise NotExistedLogConfigElementLoggerError(f"Displayed "
+                    f"level of '{user}' must be in the "
+                    f"{self._config.level(user)}, rather than {level}.")
 
     def __call__(self, user, level, *values, **kwargs):
         if user not in self._config.users():
-            raise NotExistedLogConfigElementError(f"User must be in "
+            raise NotExistedLogConfigElementLoggerError(f"User must be in "
             f"{list(self._config.users())}, rather than {user}.")
 
         if level not in self._config.level(user):
-            raise NotExistedLogConfigElementError(f"Level of '{user}' must be in "
-            f"{self._config.level(user)}, rather than {level}.")
+            raise NotExistedLogConfigElementLoggerError(f"Level of '{user}' "
+            f"must be in {self._config.level(user)}, rather than {level}.")
 
         if user not in self._display:
             return

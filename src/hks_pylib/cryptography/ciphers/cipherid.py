@@ -1,12 +1,21 @@
 from hks_pylib.cryptography.ciphers import HKSCipher
 from hks_pylib.cryptography.hashes import SHA1, SHA256, HKSHash
-from hks_pylib.errors import ExistedCipherIDError, InvalidParameterError
+
+from hks_pylib.errors import InvalidParameterError
+from hks_pylib.errors.cryptography.ciphers.cipherid import ExistedCipherIDError
+
 
 __default_sha1 = SHA1()
 __default_sha256 = SHA256()
 
-def hash_cls_name(obj, hash_obj_1: HKSHash = __default_sha1, hash_obj_2: HKSHash = __default_sha256):
-    if type(obj).__name__ == 'type' or type(obj).__name__ == 'builtin_function_or_method':
+
+def hash_cls_name(
+            obj,
+            hash_obj_1: HKSHash = __default_sha1,
+            hash_obj_2: HKSHash = __default_sha256
+        ) -> bytes:
+    if type(obj).__name__ == 'type' or\
+        type(obj).__name__ == 'builtin_function_or_method':
         cls_name = str(obj).split(".")[-1][:-2].encode()
     else:
         cls_name = type(obj).__name__.encode()
@@ -35,7 +44,8 @@ class CipherID(object):
     @staticmethod
     def register(cipher_cls):
         if not issubclass(cipher_cls, HKSCipher):
-            raise InvalidParameterError("Parameter cipher_cls must be a subclass of HKSCipher.")
+            raise InvalidParameterError("Parameter cipher_cls "
+            "must be a subclass of HKSCipher.")
 
         if hash_cls_name(cipher_cls) in CipherID._cipher_hashs.keys():
             raise ExistedCipherIDError()

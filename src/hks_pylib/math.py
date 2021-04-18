@@ -1,7 +1,7 @@
 import struct
 
-from hks_pylib.errors import InvalidBitsLengthError
-from hks_pylib.errors import InvalidElementError, InvalidParameterError
+from hks_pylib.errors import InvalidParameterError
+from hks_pylib.errors.math import InvalidBitsLengthMathError
 
 
 def ceil_div(a, b):
@@ -24,7 +24,7 @@ def bxor(A: bytes, B: bytes):
 
 def float2int(number: float, float_size: int = 4):
     if float_size not in (4, 8):
-        raise InvalidElementError("Number size only "
+        raise InvalidParameterError("Number size only "
         "can be 4 (as float) or 8 (as double).")
 
     fmt = "!d" if float_size == 8 else "!f"
@@ -36,7 +36,7 @@ def float2int(number: float, float_size: int = 4):
 
 def int2float(number: int, float_size: int = 4):
     if float_size not in (4, 8):
-        raise InvalidElementError("Number size only "
+        raise InvalidParameterError("Number size only "
         "can be 4 (as float) or 8 (as double).")
 
     fmt = "!d" if float_size == 8 else "!f"
@@ -83,10 +83,10 @@ class Bitwise(object):
             raise InvalidParameterError("Paramters must be int.")
         
         if position < 0 or length <=0:
-            raise InvalidElementError("Expect position >= 0 and length > 0.")
+            raise InvalidParameterError("Expect position >= 0 and length > 0.")
 
         if position - length + 1 < 0:
-            raise InvalidBitsLengthError("You cannot access {} "
+            raise InvalidBitsLengthMathError("You cannot access {} "
             "bits starting from {}-th position.".format(length, position))
 
         return number | (Bitwise.get_max_number(length) << (position - length + 1))
@@ -99,10 +99,10 @@ class Bitwise(object):
             raise InvalidParameterError("Paramters must be int.")
         
         if position < 0 or length <=0:
-            raise InvalidElementError("Expect position >= 0 and length > 0.")
+            raise InvalidParameterError("Expect position >= 0 and length > 0.")
         
         if position - length + 1 < 0:
-            raise InvalidBitsLengthError("You cannot access {} "
+            raise InvalidBitsLengthMathError("You cannot access {} "
             "bits starting from {}-th position.".format(length, position))
 
         return number & (~(Bitwise.get_max_number(length) << (position - length + 1)))
@@ -119,13 +119,13 @@ class Bitwise(object):
             raise InvalidParameterError("Paramters must be int.")
         
         if position < 0 or length <=0:
-            raise InvalidElementError("Expect position >= 0 and length > 0.")
+            raise InvalidParameterError("Expect position >= 0 and length > 0.")
         
         if length is None:
             length = value.bit_length()
 
         if position - length + 1 < 0:
-            raise InvalidBitsLengthError("You cannot access {} "
+            raise InvalidBitsLengthMathError("You cannot access {} "
             "bits starting from {}-th position.".format(length, position))
 
         number = Bitwise.turn_off_bits(number, position, length)
@@ -144,10 +144,10 @@ class Bitwise(object):
             raise InvalidParameterError("Paramters must be int.")
         
         if position < 0 or length <=0:
-            raise InvalidElementError("Expect position >= 0 and length > 0.")
+            raise InvalidParameterError("Expect position >= 0 and length > 0.")
         
         if position - length + 1 < 0:
-            raise InvalidBitsLengthError("You cannot access {} "
+            raise InvalidBitsLengthMathError("You cannot access {} "
             "bits starting from {}-th position.".format(length, position))
         
         number = number >> (position - length + 1)

@@ -10,9 +10,11 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from hks_pylib.errors import InvalidParameterError, NotExistKeyError
-from hks_pylib.errors import InvalidCipherParameterError, InvalidEncodingError
-from hks_pylib.errors import NotFinalizeCipherError, NotResetCipherError, UnknownHKSError
+from hks_pylib.errors import InvalidParameterError, UnknownHKSError
+from hks_pylib.errors.cryptography.ciphers import NotFinalizeCipherError
+from hks_pylib.errors.cryptography.ciphers import InvalidCipherParameterError
+from hks_pylib.errors.cryptography.ciphers import NotExistKeyError, NotResetCipherError
+from hks_pylib.errors.cryptography.ciphers.asymmetrics import InvalidEncodingError
 
 
 class Encoding(HKSEnum):

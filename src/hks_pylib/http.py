@@ -1,5 +1,6 @@
 from hks_pylib.hksenum import HKSEnum
-from hks_pylib.errors import InvalidHTTPKeyFieldError, InvalidParameterError, UnknownHTTPTypeError
+from hks_pylib.errors import InvalidParameterError
+from hks_pylib.errors.http import InvalidHTTPKeyFieldError, UnknownHTTPTypeError
 
 
 class HTTPType(HKSEnum):

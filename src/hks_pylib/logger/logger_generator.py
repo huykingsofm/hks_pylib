@@ -1,8 +1,9 @@
 from typing import Type
-from hks_pylib.errors import InvalidParameterError
+
 from hks_pylib.logger.logger import BaseLogger
 from hks_pylib.logger.config import LogConfig, console_output, FileOutput
 
+from hks_pylib.errors import InvalidParameterError
 
 class LoggerGenerator(object):
     def __init__(self, logger_cls: Type[BaseLogger], **kwargs) -> None:
