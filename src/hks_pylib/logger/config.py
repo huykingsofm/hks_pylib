@@ -10,6 +10,13 @@ class Output(object):
     def __init__(self) -> None:
         self.__lock = threading.Lock()
 
+    def __enter__(self):
+        self.open()
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.close()
+
     def open(self) -> None:
         self.__lock.acquire()
 
@@ -21,6 +28,18 @@ class Output(object):
 
 
 class ConsoleOutput(Output):
+    def __init__(self) -> None:
+        super().__init__()
+        self.__is_open = False
+
+    def open(self) -> None:
+        self.__is_open = True
+        super().open()
+
+    def close(self) -> None:
+        super().close()
+        self.__is_open = False
+
     def write(
                 self,
                 *values: object,
@@ -28,14 +47,16 @@ class ConsoleOutput(Output):
                 end: Optional[str] = "\n",
                 file = sys.stdout,
                 flush: bool = False,
-                auto_avoid_conflict: bool = False
+                auto_avoid_conflicting: bool = False
             ) -> None:
-        if auto_avoid_conflict:
+        must_closed = False
+        if auto_avoid_conflicting and not self.__is_open:
             self.open()
+            must_closed = True
 
         print(*values, sep=sep, end=end, file=file, flush=flush)
 
-        if auto_avoid_conflict:
+        if must_closed:
             self.close()
 
 console_output = ConsoleOutput()
@@ -49,17 +70,20 @@ class FileOutput(Output):
         if not isinstance(mode, str):
             raise InvalidParameterError("Parameter mode must be a str.")
 
+        if mode not in ("at", "wt"):
+            raise InvalidParameterError("Parameter mode must be 'at' or 'wt")
+
         super().__init__()
-        self.__file = filename
+        self.__filename = filename
         self.__mode = "at"
-        self.__stream = None
+        self.__file = None
 
     def open(self) -> None:
         super().open()
-        self.__stream = open(self.__file, self.__mode)
+        self.__file = open(self.__filename, self.__mode)
 
     def close(self) -> None:
-        self.__stream.close()
+        self.__file.close()
         super().close()
 
     def write(
@@ -69,7 +93,7 @@ class FileOutput(Output):
                 end: Optional[str] = "\n",
                 flush: bool = False
             ) -> None:
-        print(*values, sep=sep, end=end, file=self.__stream, flush=flush)
+        print(*values, sep=sep, end=end, file=self.__file, flush=flush)
 
 
 class LogConfig(object):

@@ -6,9 +6,8 @@ from hks_pylib.errors.cryptography.batchcrypt.batchnumber import *
 
 
 def test_batchnumber():
-    print("\nBatchNumber")
-    a = BatchNumber.bind(2, 3, 4, bit_length=8)
-    b = BatchNumber.bind(2, 4, 6, bit_length=8)
+    a = BatchNumber.bind(2, 3, 4, size=8)
+    b = BatchNumber.bind(2, 4, 6, size=8)
 
     assert a.get(0) == 2
     assert a.get(1) == 3
@@ -39,8 +38,8 @@ def test_generic_batchnumber():
     quantizer.set_int_size(32)
     quantizer.compile()
 
-    batchA = GenericBatchNumber.bind(*A, bit_length=32)
-    batchB = GenericBatchNumber.bind(*B, bit_length=32)
+    batchA = GenericBatchNumber.bind(*A, size=32)
+    batchB = GenericBatchNumber.bind(*B, size=32)
 
     batchR = batchA + batchB
     batchX = batchR + batchA
@@ -64,8 +63,8 @@ def test_signed_batchnumber():
     quantizer.set_int_size(size)
     quantizer.compile()
 
-    batchA = SignedBatchNumber.bind(*A, bit_length=size)
-    batchB = SignedBatchNumber.bind(*B, bit_length=size)
+    batchA = SignedBatchNumber.bind(*A, size=size)
+    batchB = SignedBatchNumber.bind(*B, size=size)
 
     batchR = batchA + batchB
     batchX = batchR + batchA

@@ -79,8 +79,8 @@ class GenericQuantizer(object):
             raise InvalidParameterError("Parameter i must be an int.")
         
         if not isinstance(n_cumulative, int) or n_cumulative < 1:
-            raise InvalidParameterError("Parameter n_cummulative must be\
-                a int and greater than 0.")
+            raise InvalidParameterError("Parameter n_cummulative must be"
+                "a int and greater than 0.")
         
         if self.__offset is None or self.__scale is None:
             raise NotCompileQuatizerError("Please calling compile() before.")
