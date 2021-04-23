@@ -6,20 +6,21 @@ from hks_pylib.errors.cryptography.batchcrypt.integer import OutOfRangeIntegerEr
 from hks_pylib.errors.cryptography.batchcrypt.integer import MismatchedSizeIntegerError
 
 class SignedInteger(object):
-    __SIGN_SIZE = 4
+    __SIGN_SIZE = 2
 
-    @staticmethod
     def sign_size():
         return SignedInteger.__SIGN_SIZE
 
-    @staticmethod
-    def total_size_(original_size: int):
-        return original_size + SignedInteger.sign_size() - 1
+    def set_sign_size(value: int):
+        if not isinstance(value, int) or value < 1:
+            raise InvalidParameterError("Sign size must be a "
+            "int larger than 0.")
+
+        SignedInteger.__SIGN_SIZE = value
 
     @staticmethod
-    def is_overflow(number: int, original_size: int):
-        total_size = original_size + SignedInteger.sign_size() - 1
-        value_size = original_size - 1
+    def is_overflow(number: int, size: int):
+        value_size = size - SignedInteger.sign_size()
         value = Bitwise.get_bits(
                 number=number,
                 position=value_size - 1,
@@ -28,34 +29,33 @@ class SignedInteger(object):
 
         sign = Bitwise.get_bits(
                 number=number,
-                position=total_size - 1,
+                position=size - 1,
                 length=SignedInteger.sign_size()
             )
 
-        if sign != 0 and sign != Bitwise.get_max_number(SignedInteger.sign_size()):
+        if sign != 0 and sign != Bitwise.max_natural_number(SignedInteger.sign_size()):
             return True
 
-        if sign == Bitwise.get_max_number(SignedInteger.sign_size()) and value == 0:
+        if sign == Bitwise.max_natural_number(SignedInteger.sign_size()) and value == 0:
             return True
         
         return False
 
     @staticmethod
-    def is_out_of_range(number: int, original_size: int):
-        max_value = Bitwise.get_max_number(original_size - 1)
+    def is_out_of_range(number: int, size: int):
+        max_value = Bitwise.max_natural_number(size - SignedInteger.sign_size())
         if number < -max_value or number > max_value:
             return True
         
         return False
 
     @staticmethod
-    def from_int(number: int, original_size: int):
-        total_size = original_size + SignedInteger.sign_size() - 1
-        value_size = original_size - 1
+    def from_int(number: int, size: int):
+        value_size = size - SignedInteger.sign_size()
 
-        if SignedInteger.is_out_of_range(number, original_size):
+        if SignedInteger.is_out_of_range(number, size):
             raise OutOfRangeIntegerError("Imported number is out "
-            "of range (signed integer {}-bit)".format(original_size))
+            "of range (signed integer {}-bit)".format(size))
 
         actual_number = Bitwise.get_bits(
                 number=number,
@@ -71,79 +71,81 @@ class SignedInteger(object):
             )
         
         if number < 0: # positive (0..0), negative (1..1)
-            sign_value = Bitwise.get_max_number(SignedInteger.sign_size()) 
+            sign_value = Bitwise.max_natural_number(SignedInteger.sign_size()) 
         else:
             sign_value = 0
 
         raw_number = Bitwise.set_bits(
                 number=raw_number,
-                position=total_size - 1,
+                position=size - 1,
                 value=sign_value,
                 length=SignedInteger.sign_size()
             )
 
-        return SignedInteger(raw_number, original_size)
+        return SignedInteger(raw_number, size)
 
-    def __init__(self, number: int, original_size: int) -> None:
+    def __init__(self, number: int, size: int) -> None:
         super().__init__()
-        self._total_size = original_size + self.sign_size() - 1
-        self._value_size = original_size - 1
+        self._size = size
+        self._value_size = size - SignedInteger.sign_size()
 
-        if self.is_overflow(number, original_size):
-            raise OverflowIntegerError("Invalid sign value, "
-            "expected 0 (positive) or {} (negative).".format(
-                Bitwise.get_max_number(SignedInteger.sign_size()))
+        if self.is_overflow(number, size):
+            max_value = Bitwise.max_natural_number(self.value_size())
+            min_value = -max_value
+            raise OverflowIntegerError("Invalid number, "
+            "expected {} <= number <= {}, rather than {}.".format(
+                min_value, max_value, number)
             )
 
-        self._number = Bitwise.get_bits(
+        self._raw_number = Bitwise.get_bits(
                 number=number,
-                position=self._total_size - 1,
-                length=self._total_size
+                position=self.size() - 1,
+                length=self.size()
             )
 
-    def to_int(self):
-        return self._number
+    def raw(self):
+        return self._raw_number
 
-    def total_size(self):
-        return self._total_size
+    def size(self):
+        return self._size
 
-    def original_size(self):
-        return self._value_size + 1
+    def value_size(self):
+        return self._value_size
 
     def value(self):
         sign = Bitwise.get_bits(
-                number=self._number,
-                position=self._total_size - 1,
-                length=self.sign_size()
+                number=self.raw(),
+                position=self.size() - 1,
+                length=SignedInteger.sign_size()
             )
 
         value = Bitwise.get_bits(
-                number=self._number,
-                position=self._value_size - 1,
-                length=self._value_size
+                number=self.raw(),
+                position=self.value_size() - 1,
+                length=self.value_size()
             )
 
-        if sign == Bitwise.get_max_number(SignedInteger.sign_size()):
-            value = -Bitwise.get_bits(
+        if sign == Bitwise.max_natural_number(SignedInteger.sign_size()):
+            value = 0 - Bitwise.get_bits(
                     number=~value+1,
-                    position=self._value_size - 1,
-                    length=self._value_size
+                    position=self.value_size() - 1,
+                    length=self.value_size()
                 )
 
         return value
 
     def __ops__(self, other, operator):
-        if not isinstance(other, SignedInteger):
+        if not isinstance(other, type(self)):
             raise InvalidParameterError("Parameter of "
-            "additive operator must be SignedInteger objects.")
+            "arithmetic operator must be {} objects.".format(type(self).__name__))
 
-        if self._total_size != other._total_size:
+        if self.size() != other.size():
             raise MismatchedSizeIntegerError("Two operands must be "
-            "the same size ({} != {}).".format(self._total_size, other._total_size))
+            "the same size ({} != {}).".format(self.size(), other.size()))
 
-        raw_result = operator(self._number, other._number)
+        raw_result = operator(self.raw(), other.raw())
 
-        return SignedInteger(raw_result, self.original_size())
+        return SignedInteger(raw_result, self.size())
 
     def __add__(self, other):
         add = lambda x, y: x + y
@@ -158,7 +160,7 @@ class SignedInteger(object):
         return self.__ops__(other, mul)
 
     def __cmp__(self, other, operator):
-        if isinstance(other, SignedInteger):
+        if isinstance(other, type(self)):
             return operator(self.value(), other.value())
         else:
             return operator(self.value(), other)

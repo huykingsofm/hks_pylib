@@ -68,7 +68,12 @@ class Bitwise(object):
     
     
     @staticmethod
-    def get_max_number(bit_length: int):
+    def max_natural_number(bit_length: int):
+        """
+        Return the max natural number has the size of bit_length.\n
+        Example: `max_natural_number(8) = 255`.
+        """
+
         if not isinstance(bit_length, int) or bit_length <= 0:
             raise InvalidParameterError("Parameter bit_length "
             "must be an int and larger than 0");
@@ -89,7 +94,7 @@ class Bitwise(object):
             raise InvalidBitsLengthMathError("You cannot access {} "
             "bits starting from {}-th position.".format(length, position))
 
-        return number | (Bitwise.get_max_number(length) << (position - length + 1))
+        return number | (Bitwise.max_natural_number(length) << (position - length + 1))
 
     @staticmethod
     def turn_off_bits(number: int, position: int, length: int = 1):
@@ -105,7 +110,7 @@ class Bitwise(object):
             raise InvalidBitsLengthMathError("You cannot access {} "
             "bits starting from {}-th position.".format(length, position))
 
-        return number & (~(Bitwise.get_max_number(length) << (position - length + 1)))
+        return number & (~(Bitwise.max_natural_number(length) << (position - length + 1)))
 
     @staticmethod
     def set_bits(number: int, position: int, value: int, length: int = None):
@@ -152,5 +157,5 @@ class Bitwise(object):
         
         number = number >> (position - length + 1)
         
-        number = number & Bitwise.get_max_number(length)
+        number = number & Bitwise.max_natural_number(length)
         return number

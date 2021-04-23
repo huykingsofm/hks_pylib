@@ -8,3 +8,4 @@
 + Remove `requirements.txt`.
 + Add `Bitwise` operator to `math`.
 + Add [`batchcrypt`](https://www.usenix.org/conference/atc20/presentation/zhang-chengliang) module to `hks_pylib.cryptography`.
++ Add an example of `batchcrypt` in folder `examples/`.

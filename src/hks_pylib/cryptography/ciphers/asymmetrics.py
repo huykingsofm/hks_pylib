@@ -26,8 +26,8 @@ class RSAKey(object):
     def __init__(self, encoding: str = Encoding.PEM.value) -> None:
         super().__init__()
         if encoding not in Encoding.values():
-            raise InvalidParameterError("encoding must be an value in {} "
-            "(e.g. Encoding.PEM.value).".format(Encoding.values()))
+            raise InvalidParameterError("Parameter encoding must be an value "
+            "in {} (e.g. Encoding.PEM.value).".format(Encoding.values()))
 
         self._encoding = encoding
         self.__private_key = None
@@ -86,7 +86,7 @@ class RSAKey(object):
             _load_private_key = serialization.load_der_private_key
         else:
             raise InvalidEncodingError("Invalid encoding ({}), please choose an encoding in "
-            "hks_pylib.cryptography.ciphers.asymmetric.Encoding.".format(self._encoding))
+            "hks_pylib.cryptography.ciphers.asymmetrics.Encoding.".format(self._encoding))
         
         self.__private_key = _load_private_key(
             data=data,
@@ -115,7 +115,7 @@ class RSAKey(object):
             _load_public_key = serialization.load_der_public_key
         else:
             raise InvalidEncodingError("Invalid encoding ({}), please choose an encoding in "
-            "hks_pylib.cryptography.ciphers.asymmetric.Encoding.".format(self._encoding))
+            "hks_pylib.cryptography.ciphers.asymmetrics.Encoding.".format(self._encoding))
 
         self.__public_key = _load_public_key(data=data)
 

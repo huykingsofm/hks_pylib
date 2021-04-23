@@ -5,7 +5,7 @@ from hks_pylib.errors import InvalidParameterError
 from hks_pylib.errors.cryptography.batchcrypt.quantization import *
 
 
-class GenericQuantizer(object):
+class Quantizer(object):
     def __init__(self) -> None:
         self.__float_range = None
         self.__int_range = None
@@ -28,17 +28,17 @@ class GenericQuantizer(object):
     def set_int_size(self, size_in_bit: int, signed: bool = False):
         if not isinstance(size_in_bit, int):
             raise InvalidParameterError("Parameter size_in_bit must be an int.")
-        
+
         if size_in_bit <= 0:
             raise InvalidParameterError("Parameter size_in_bit must be an "
             "positive number.")
 
         if not signed:
-            max_value = Bitwise.get_max_number(size_in_bit)
+            max_value = Bitwise.max_natural_number(size_in_bit)
             min_value = 0
 
         else:
-            max_value = Bitwise.get_max_number(size_in_bit - 1)
+            max_value = Bitwise.max_natural_number(size_in_bit - 1)
             min_value = -max_value
 
         self.__int_range = (min_value, max_value)
@@ -49,8 +49,8 @@ class GenericQuantizer(object):
             "int size before calling compile().")
         
         if self.__float_range is None:
-            raise NotSetRangeOfQuantizerError("Please set float range "
-            "before calling compile().")
+            raise NotSetRangeOfQuantizerError("Please set "
+            "float range before calling compile().")
 
         maxi, mini = self.__int_range
         maxf, minf = self.__float_range
@@ -66,7 +66,7 @@ class GenericQuantizer(object):
 
         if not force and\
             (f < self.__float_range[0] or f > self.__float_range[1]):
-            raise OverflowQuantizerError("Value is out of range "
+            raise OverflowQuantizerError("Float value is out of range "
             "(expected {} <= f <= {}).".format(
                 self.__float_range[0],
                 self.__float_range[1]
@@ -89,7 +89,7 @@ class GenericQuantizer(object):
 
         if not force and\
             (i < self.__int_range[0] or i > self.__int_range[1]):
-            raise OverflowQuantizerError("Value is out of range "
+            raise OverflowQuantizerError("Int value is out of range "
             "(expected {} <= i <= {}).".format(
                 self.__int_range[0],
                 self.__int_range[1]
@@ -97,7 +97,7 @@ class GenericQuantizer(object):
 
         return (i - self.__offset) / self.__scale
 
-class SignedQuantizer(GenericQuantizer):
+""" class SignedQuantizer(Quantizer):
     def __init__(self) -> None:
         super().__init__()
         self.__size = None
@@ -116,15 +116,16 @@ class SignedQuantizer(GenericQuantizer):
     def compile(self):
         super().compile()
 
-    def f2i(self, f: float, force: bool = False) -> SignedInteger:
+    def f2i(self, f: float, force: bool = False) -> int:
         raw_result = super().f2i(f, force=force)
-        result = SignedInteger.from_int(raw_result, self.__size)
-        return result
+        #result = SignedInteger.from_int(raw_result, self.__size)
+        return raw_result
 
-    def i2f(self, i: SignedInteger, force: bool = False) -> float:
+    def i2f(self, i: int, force: bool = False) -> float:
         if not isinstance(i, SignedInteger):
             raise InvalidParameterError("Parameter i must be a SignedInteger object.")
 
         i = i.value()
 
         return super().i2f(i, force=force, n_cumulative=1)
+ """

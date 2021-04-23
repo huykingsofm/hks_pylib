@@ -1,7 +1,6 @@
 import random
 
-from hks_pylib.cryptography.batchcrypt.quantization import SignedQuantizer
-from hks_pylib.cryptography.batchcrypt.quantization import GenericQuantizer
+from hks_pylib.cryptography.batchcrypt.quantization import Quantizer
 
 from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
 from hks_pylib.errors.cryptography.batchcrypt.quantization import OverflowQuantizerError
@@ -9,11 +8,10 @@ from hks_pylib.errors.cryptography.batchcrypt.quantization import OverflowQuanti
 def test_generic_quantizer():
     frange = 1.0
     isize = 16
-    signed = True
 
-    quantizer = GenericQuantizer()
+    quantizer = Quantizer()
     quantizer.set_float_range(-frange, frange)
-    quantizer.set_int_size(isize, signed=signed)
+    quantizer.set_int_size(isize, signed=False)
     quantizer.compile()
 
     f1 = random.randint(-frange*100, frange*100) / 100
@@ -25,7 +23,7 @@ def test_generic_quantizer():
     isum = i1 + i2
 
     try:
-        dfsum = quantizer.i2f(isum)
+        dfsum = quantizer.i2f(isum, n_cumulative=2)
 
         if f1 + f2 < -frange or f1 + f2 > frange:
             assert False
@@ -39,9 +37,9 @@ def test_signed_quantizer():
     frange = 1.0
     isize = 16
 
-    quantizer = SignedQuantizer()
+    quantizer = Quantizer()
     quantizer.set_float_range(-frange, frange)
-    quantizer.set_int_size(isize)
+    quantizer.set_int_size(isize, signed=True)
     quantizer.compile()
 
     f1 = random.randint(-frange*100, frange*100) / 100
@@ -52,12 +50,15 @@ def test_signed_quantizer():
 
     try:
         isum = i1 + i2
+        dfsum = quantizer.i2f(isum)
         
         if f1 + f2 < -frange or f1 + f2 > frange:
             assert False
-        
-        dfsum = quantizer.i2f(isum)
+
         assert abs(dfsum - (f1 + f2)) <= 1e-2
     except OverflowIntegerError:
         if f1 + f2 >= -frange and f1 + f2 <= frange:
             assert False
+
+if __name__ == "__main__":
+    test_generic_quantizer()

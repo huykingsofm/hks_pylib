@@ -2,16 +2,21 @@ import random
 
 from hks_pylib.cryptography.batchcrypt.integer import SignedInteger
 from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
+from hks_pylib.math import Bitwise
 
 def test_integer():
-    range_value = 127
     size = 8
+    range_value = Bitwise.max_natural_number(size - SignedInteger.sign_size())
+
 
     sample_a = random.randint(-range_value, range_value)
     sample_b = random.randint(-range_value, range_value)
 
-    a = SignedInteger.from_int(sample_a, 8)
-    b = SignedInteger.from_int(sample_b, 8)
+    a = SignedInteger.from_int(sample_a, size)
+    b = SignedInteger.from_int(sample_b, size)
+
+    assert a.value() == sample_a
+    assert b.value() == sample_b
 
     try:
         add = a + b
@@ -35,3 +40,6 @@ def test_integer():
 
     #mul = a * b
     #print("mul", bin(mul.to_int()), mul.value())
+
+if __name__ == "__main__":
+    test_integer()
