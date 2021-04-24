@@ -1,10 +1,18 @@
 import time
+import random
 
 from hks_pylib.cryptography.batchcrypt.batchnumber import SignedBatchNumber
 from hks_pylib.errors.cryptography.batchcrypt.quantization import OverflowQuantizerError
 from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
 
+
 SLEEP_TIME = 0
+
+
+def random_array(low, high, num):
+    # Random a float array of num elements, whose elements is in [low, high]
+    random_float = lambda l, h: random.randint(int(l * 1000), int(h * 1000)) / 1000
+    return [random_float(low, high) for _ in range(num)]
 
 def encrypt(plaintext):
     # Please implement this function as your demand.
@@ -24,7 +32,32 @@ def add(ciphertext1, ciphertext2):
     return ciphertext1 + ciphertext2
 
 
-def encrypt_an_array():
+def communication():
+    # There are three parties in this example:
+    #   + The Server.
+    #   + The Client 1 (host client).
+    #   + The Client 2.
+
+    # Context: The Client 1 and 2 request the Server to compute sum of two
+    #   array A and B. However, the condition is the Server must not see 
+    #   the original array.
+
+    # Method: 
+    #   + Client 1 generate a additively HE keypair, called K = (puk, prk).
+    #   + Client 1 shares puk with Client 2.
+    #   + Client 1 encrypts A by puk, create A'.
+    #   + Client 2 encrypts B by puk, create B'. 
+    #   + Client 1 and 2 send A', B' to the Server.
+    #   + The Server perform additive operation on these encrypted array.
+    #   + The Server send the result to Client 1.
+    #   + Client 1 decrypts the result by prk.
+
+    # BatchNumber:
+    #   + A and B have many elements, so that the ciphertext size is very large.
+    #   + Before encrypting arrays, A and B will be batched by
+    #       a class called SignedBatchNumber.
+    #   + Encryption and decryption perform on these batched data.
+
     # --> THE COMMON CONSTANTS BETWEEN THE SERVER AND CLIENTS <--
 
     frange = (-20.0, 20.0)  # Range of float value in quantization.
@@ -39,14 +72,14 @@ def encrypt_an_array():
 
     max_numbers_per_batch = 10  # == len(A) == len(B)
                                 # If an array is not enough numbers, 
-                                # we would perform a padding technique.
+                                # you should perform a padding operation.
 
     epsilon = 1e-5  # Expected minimum different of float 
                     # value between before and after quantizing.
     # ---------------------------------------------------
 
     # SignedBatchNumber.quantizer should be initialized the same at every entities.
-    # At client 1, client 2, and server.
+    # At the client 1, client 2, and server.
     SignedBatchNumber.quantizer(
         float_range=frange,
         int_size=isize
@@ -58,7 +91,7 @@ def encrypt_an_array():
     print()
 
     # AT THE CLIENT 1 (HOST CLIENT)
-    A = [3.832, 8.59, -3.483, -6.702, 8.706, -7.674, -8.124, 9.186, -0.067, 3.017]
+    A = random_array(frange[0] + 10, frange[1] - 10, max_numbers_per_batch)
     print("[1] The client 1 created the array A.")
     print("[1] A =", A)
     time.sleep(SLEEP_TIME)
@@ -83,7 +116,7 @@ def encrypt_an_array():
 
 
     # AT THE CLIENT 2
-    B = [-5.032, 3.183, -4.383, 5.589, 6.519, -9.281, 3.996, -3.245, -8.343, -8.723]
+    B = random_array(frange[0] + 10, frange[1] - 10, max_numbers_per_batch)
     print("[2] The client 2 created the array B.")
     print("[2] B =", B)
     time.sleep(SLEEP_TIME)
@@ -148,7 +181,8 @@ def encrypt_an_array():
     time.sleep(SLEEP_TIME)
     print()
 
-    print("[X] Check the accuracy and differentation of batchnumber.")
+    print("[1] Check the accuracy and differentation of batchnumber.")
+    print("[1] The number of elements of batchR:", len(recover_batchR))
     for i, (a, b) in enumerate(zip(A, B)):
         try:
             r = recover_batchR[i]
@@ -165,4 +199,4 @@ def encrypt_an_array():
                 assert False
 
 if __name__ == "__main__":
-    encrypt_an_array()
+    communication()

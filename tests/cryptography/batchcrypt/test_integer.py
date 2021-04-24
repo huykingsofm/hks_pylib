@@ -1,8 +1,10 @@
 import random
 
+from hks_pylib.math import Bitwise
+
 from hks_pylib.cryptography.batchcrypt.integer import SignedInteger
 from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
-from hks_pylib.math import Bitwise
+
 
 def test_integer():
     size = 8
@@ -40,6 +42,7 @@ def test_integer():
 
     #mul = a * b
     #print("mul", bin(mul.to_int()), mul.value())
+
 
 if __name__ == "__main__":
     test_integer()

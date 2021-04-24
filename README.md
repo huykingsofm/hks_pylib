@@ -62,7 +62,7 @@ from hks_pylib.logger import StandardLoggerGenerator
 # You may use our console_output instead of print builtin function
 # in a multithread program
 from hks_pylib.logger import console_output
-console_output.write("Something", auto_avoid_conflict = True)
+console_output.write("Something", auto_avoid_conflicting = True)
 
 # Some common ciphers
 from hks_pylib.cipher import NoCipher, AES_CBC, SimpleSSL 

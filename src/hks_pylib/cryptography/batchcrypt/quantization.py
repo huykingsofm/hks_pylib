@@ -1,4 +1,3 @@
-from hks_pylib.cryptography.batchcrypt.integer import SignedInteger
 from hks_pylib.math import Bitwise
 
 from hks_pylib.errors import InvalidParameterError
@@ -96,36 +95,3 @@ class Quantizer(object):
             ))
 
         return (i - self.__offset) / self.__scale
-
-""" class SignedQuantizer(Quantizer):
-    def __init__(self) -> None:
-        super().__init__()
-        self.__size = None
-
-    def set_float_range(self, min_value: float, max_value: float):
-        if min_value + max_value != 0:
-            raise InvalidParameterError("BatchCrypt Quantization "
-            "require range of float to be symmetric.")
-
-        super().set_float_range(min_value, max_value)
-
-    def set_int_size(self, size_in_bit: int):
-        super().set_int_size(size_in_bit, signed=True)
-        self.__size = size_in_bit
-
-    def compile(self):
-        super().compile()
-
-    def f2i(self, f: float, force: bool = False) -> int:
-        raw_result = super().f2i(f, force=force)
-        #result = SignedInteger.from_int(raw_result, self.__size)
-        return raw_result
-
-    def i2f(self, i: int, force: bool = False) -> float:
-        if not isinstance(i, SignedInteger):
-            raise InvalidParameterError("Parameter i must be a SignedInteger object.")
-
-        i = i.value()
-
-        return super().i2f(i, force=force, n_cumulative=1)
- """

@@ -122,12 +122,12 @@ class Bitwise(object):
             or not isinstance(value, int)\
             or (length is not None and not isinstance(length, int)):
             raise InvalidParameterError("Paramters must be int.")
-        
-        if position < 0 or length <=0:
-            raise InvalidParameterError("Expect position >= 0 and length > 0.")
-        
+                
         if length is None:
             length = value.bit_length()
+
+        if position < 0 or length <=0:
+            raise InvalidParameterError("Expect position >= 0 and length > 0.")
 
         if position - length + 1 < 0:
             raise InvalidBitsLengthMathError("You cannot access {} "

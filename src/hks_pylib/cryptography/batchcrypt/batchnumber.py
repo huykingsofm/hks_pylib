@@ -1,18 +1,21 @@
-from hks_pylib.cryptography.batchcrypt.integer import SignedInteger
-from hks_pylib.errors import InvalidParameterError
-from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
-from hks_pylib.errors.cryptography.batchcrypt.quantization import OverflowQuantizerError
 from hks_pylib.math import Bitwise
+
+from hks_pylib.cryptography.batchcrypt.integer import SignedInteger
 from hks_pylib.cryptography.batchcrypt.quantization import Quantizer
 
+from hks_pylib.errors import InvalidParameterError
 from hks_pylib.errors.cryptography.batchcrypt.batchnumber import *
+from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
+
 
 class BatchNumber(object):
     __PADDING_SIZE = 2
 
+    @staticmethod
     def padding_size():
         return BatchNumber.__PADDING_SIZE
-    
+
+    @staticmethod
     def set_padding_size(value: int):
         if not isinstance(value, int) or value < 0:
             raise InvalidParameterError("Padding size must be a "

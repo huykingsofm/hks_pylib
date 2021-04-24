@@ -1,8 +1,7 @@
-from math import fabs
 import random
+
 from hks_pylib.cryptography.batchcrypt.batchnumber import GenericBatchNumber
 from hks_pylib.cryptography.batchcrypt.batchnumber import BatchNumber, SignedBatchNumber
-from hks_pylib.cryptography.batchcrypt.integer import SignedInteger
 
 from hks_pylib.errors.cryptography.batchcrypt.integer import *
 from hks_pylib.errors.cryptography.batchcrypt.batchnumber import *
@@ -90,6 +89,7 @@ def test_generic_batchnumber():
                 print("a={}, b={}, r={}, x={}".format(a, B[i], r, x))
                 print(A, B)
                 assert False
+
 
 def test_signed_batchnumber():
     frange = (-20.0, 20.0)

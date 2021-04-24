@@ -5,6 +5,7 @@ from hks_pylib.cryptography.batchcrypt.quantization import Quantizer
 from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
 from hks_pylib.errors.cryptography.batchcrypt.quantization import OverflowQuantizerError
 
+
 def test_generic_quantizer():
     frange = 1.0
     isize = 16
@@ -33,6 +34,7 @@ def test_generic_quantizer():
         if f1 + f2 >= -frange and f1 + f2 <= frange:
             assert False
 
+
 def test_signed_quantizer():
     frange = 1.0
     isize = 16
@@ -59,6 +61,7 @@ def test_signed_quantizer():
     except OverflowIntegerError:
         if f1 + f2 >= -frange and f1 + f2 <= frange:
             assert False
+
 
 if __name__ == "__main__":
     test_generic_quantizer()

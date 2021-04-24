@@ -8,9 +8,11 @@ from hks_pylib.errors.cryptography.batchcrypt.integer import MismatchedSizeInteg
 class SignedInteger(object):
     __SIGN_SIZE = 2
 
+    @staticmethod
     def sign_size():
         return SignedInteger.__SIGN_SIZE
 
+    @staticmethod
     def set_sign_size(value: int):
         if not isinstance(value, int) or value < 1:
             raise InvalidParameterError("Sign size must be a "
