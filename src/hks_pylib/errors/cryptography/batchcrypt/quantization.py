@@ -1,13 +1,13 @@
 from hks_pylib.errors.cryptography.batchcrypt import BatchCryptError
 
 
-class NotSetRangeOfQuantizerError(BatchCryptError):
-    "Exception is raised if you don't provide enough range."
+class QuantizerError(BatchCryptError):
+    "The exception is raised when you quantize without compiling."
 
 
-class OverflowQuantizerError(BatchCryptError):
-    "Exception is raised when you pass a value out of range in quantizer."
+class RangeOfQuantizerError(QuantizerError):
+    "The exception is raised if you don't provide enough range."
 
 
-class NotCompileQuatizerError(BatchCryptError):
-    "Exception is raised when you quantize without compiling."
+class OverflowQuantizerError(QuantizerError):
+    "The exception is raised when you pass a value out of range in quantizer."

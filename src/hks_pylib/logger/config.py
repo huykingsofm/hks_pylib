@@ -2,9 +2,10 @@ import sys
 import threading
 from typing import Dict, Optional, Set
 
-from hks_pylib.errors import InvalidParameterError
-from hks_pylib.errors.logger import ExistedLogConfigElementLoggerError
-from hks_pylib.errors.logger import NotExistedLogConfigElementLoggerError
+from hkserror import HTypeError
+from hkserror.hkserror import HFormatError
+from hks_pylib.errors.logger import LogConfigError
+from hks_pylib.logger.standard import Levels, Users
 
 class Output(object):
     def __init__(self) -> None:
@@ -65,17 +66,17 @@ console_output = ConsoleOutput()
 class FileOutput(Output):
     def __init__(self, filename: str, mode: str = "at") -> None:
         if not isinstance(filename, str):
-            raise InvalidParameterError("Parameter filename must be a str.")
+            raise HTypeError("filename", filename, str)
 
         if not isinstance(mode, str):
-            raise InvalidParameterError("Parameter mode must be a str.")
+            raise HTypeError("mode", mode, str)
 
         if mode not in ("at", "wt"):
-            raise InvalidParameterError("Parameter mode must be 'at' or 'wt")
+            raise HFormatError("Parameter mode must be 'at' or 'wt'.")
 
         super().__init__()
         self.__filename = filename
-        self.__mode = "at"
+        self.__mode = mode
         self.__file = None
 
     def open(self) -> None:
@@ -99,74 +100,75 @@ class FileOutput(Output):
 class LogConfig(object):
     def __init__(self) -> None:
         super().__init__()
-        self.__user_level: Dict[str, Set[str]] = {}
-        self.__user_output: Dict[str, Output] = {}
+        self.__user_level: Dict[Users, Set[Levels]] = {}
+        self.__user_output: Dict[Users, Output] = {}
 
-    def add_user(self, user: str):
-        if not isinstance(user, str):
-            raise InvalidParameterError("Parameter user must be a str.")
+    def add_user(self, user: Users):
+        if not isinstance(user, Users):
+            raise HTypeError("user", user, Users)
 
-        assert user not in self.__user_level.keys()
+        if user in self.__user_level.keys():
+            raise LogConfigError("User {} has ready existed in config.".format(user))
 
         self.__user_level[user] = set()
         self.__user_output[user] = None
 
-    def _add_level_one_element(self, user: str, level: str):
-        if not isinstance(user, str):
-            raise InvalidParameterError("Parameter user must be a str.")
+    def _add_level_one_element(self, user: Users, level: Levels):
+        if not isinstance(user, Users):
+            raise HTypeError("user", user, Users)
 
-        if not isinstance(level, str):
-            raise InvalidParameterError("Parameter level must be a str.")
+        if not isinstance(level, Levels):
+            raise HTypeError("level", level, Levels)
 
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementLoggerError("User {} does "
+            raise LogConfigError("User {} does "
             "not exist.".format(user))
 
         if level in self.__user_level[user]:
-            raise ExistedLogConfigElementLoggerError("Level {} has "
+            raise LogConfigError("Level {} has "
             "already existed.".format(level))
 
         self.__user_level[user].add(level)
 
-    def add_level(self, user: str, *levels):
+    def add_level(self, user: Users, *levels):
         if len(levels) == 0:
-            raise InvalidParameterError("Please provide at least one level.")
+            raise HFormatError("Please provide at least one level.")
 
         for level in levels:
             self._add_level_one_element(user, level)
 
-    def set_output(self, user: str, output: Output):
-        if not isinstance(user, str):
-            raise InvalidParameterError("Paramter user must be a str.")
+    def set_output(self, user: Users, output: Output):
+        if not isinstance(user, Users):
+            raise HTypeError("user", user, Users)
 
         if not isinstance(output, Output):
-            raise InvalidParameterError("Paramter output must be an Output object.")
-        
+            raise HTypeError("output", output, Output)
+
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementLoggerError("User {} does "
+            raise LogConfigError("User {} does "
             "not exist.".format(user))
-        
+
         self.__user_output[user] = output
 
     def users(self):
         return set(self.__user_level.keys())
 
-    def level(self, user: str):
-        if not isinstance(user, str):
-            raise InvalidParameterError("Paramter user must be a str.")
+    def levels(self, user: Users):
+        if not isinstance(user, Users):
+            raise HTypeError("user", user, Users)
 
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementLoggerError("User {} does "
+            raise LogConfigError("User {} does "
             "not exist.".format(user))
 
         return self.__user_level[user]
 
     def output(self, user: str):
-        if not isinstance(user, str):
-            raise InvalidParameterError("Paramter user must be a str.")
+        if not isinstance(user, Users):
+            raise HTypeError("user", user, Users)
 
         if user not in self.__user_level.keys():
-            raise NotExistedLogConfigElementLoggerError("User {} does "
+            raise LogConfigError("User {} does "
             "not exist.".format(user))
 
         return self.__user_output[user]

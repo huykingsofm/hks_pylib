@@ -1,5 +1,5 @@
-from hks_pylib.errors import HKSError
+from hks_pylib.errors import HKSPylibError
 
 
-class HKSEnumError(HKSError):
-    "Exception is raised by failures in hksenum module."
+class HKSEnumError(HKSPylibError):
+    "The exception is raised by failures in hksenum module."

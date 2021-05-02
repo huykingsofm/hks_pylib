@@ -1,4 +1,13 @@
 # Change log
+## Version 0.0.6
++ Change .gitignore to template of Python.
++ Change the `http` style.
++ Change the `logger` to `HKSEnum` style.
++ Add `InvisibleLoggerGenerator`, `InvisibleLogger` for some convenient.
++ Add some utility methods to `HKSEnum` and `Done`.
++ Change many error types and replace some errors to `hkserror`.
+<!---Commit at 02/05/2021 8:00:00-->
+
 ## Version 0.0.5
 + Change allmost all generic exceptions to highly identified exceptions (in modules of `hks_pylib.errors`).
 + Add the `Output` class to `hks_pylib.logger.config`. Now logger can easily avoid conflicting in printing.

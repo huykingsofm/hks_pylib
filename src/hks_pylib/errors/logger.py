@@ -1,13 +1,9 @@
-from hks_pylib.errors import HKSError
+from hks_pylib.errors import HKSPylibError
 
 
-class LoggerError(HKSError):
-    "Exception is raised by failures in logger module."
+class LoggerError(HKSPylibError):
+    "The exception is raised by failures in logger module."
 
 
-class ExistedLogConfigElementLoggerError(LoggerError):
-    "Exception is raised when you add an existed user to config object."
-
-
-class NotExistedLogConfigElementLoggerError(LoggerError):
-    "Exception is raised when you access to a not existed user in config object."
+class LogConfigError(LoggerError):
+    "The exception is raised by failures related to LogConfig elements."

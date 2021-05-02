@@ -1,5 +1,5 @@
-from hks_pylib.errors import HKSError
+from hks_pylib.errors import HKSPylibError
 
 
-class DoneError(HKSError):
-    "Exception is raised by failures in done module."
+class DoneError(HKSPylibError):
+    "The exception is raised by failures in done module."

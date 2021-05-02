@@ -1,7 +1,8 @@
 import struct
 
-from hks_pylib.errors import InvalidParameterError
-from hks_pylib.errors.math import InvalidBitsLengthMathError
+from hkserror import HTypeError
+from hkserror.hkserror import HFormatError
+from hks_pylib.errors.math import BitwiseError
 
 
 def ceil_div(a, b):
@@ -9,11 +10,14 @@ def ceil_div(a, b):
 
 
 def bxor(A: bytes, B: bytes):
-    if not isinstance(A, bytes) or not isinstance(B, bytes):
-        raise InvalidParameterError("Parameter A and B must be bytes objects.")
+    if not isinstance(A, bytes):
+        raise HTypeError("A", A, bytes)
+
+    if not isinstance(B, bytes):
+        raise HTypeError("B", B, bytes)
 
     if len(A) != len(B):
-        raise InvalidParameterError("Parameter A and B must be the same size.")
+        raise HFormatError("Parameter A and B expected to be the same size.")
 
     iA = int.from_bytes(A, "big")
     iB = int.from_bytes(B, "big")
@@ -23,8 +27,14 @@ def bxor(A: bytes, B: bytes):
 
 
 def float2int(number: float, float_size: int = 4):
+    if not isinstance(number, float):
+        raise HTypeError("number", number, float)
+    
+    if not isinstance(float_size, int):
+        raise HTypeError("float_size", float_size, int)
+
     if float_size not in (4, 8):
-        raise InvalidParameterError("Number size only "
+        raise HFormatError("Parameter float_size only "
         "can be 4 (as float) or 8 (as double).")
 
     fmt = "!d" if float_size == 8 else "!f"
@@ -35,8 +45,14 @@ def float2int(number: float, float_size: int = 4):
 
 
 def int2float(number: int, float_size: int = 4):
+    if not isinstance(number, int):
+        raise HTypeError("number", number, int)
+    
+    if not isinstance(float_size, int):
+        raise HTypeError("float_size", float_size, int)
+
     if float_size not in (4, 8):
-        raise InvalidParameterError("Number size only "
+        raise HFormatError("Parameter float_size only "
         "can be 4 (as float) or 8 (as double).")
 
     fmt = "!d" if float_size == 8 else "!f"
@@ -66,6 +82,34 @@ class Bitwise(object):
     `Out: 0 0 0 0 1 1 1 0`
     """
     
+
+    @staticmethod
+    def __validate(number: int, position: int, length: int, value: int = 0):
+        if not isinstance(number, int):
+            raise HTypeError("number", number, int)
+        
+        if not isinstance(position, int):
+            raise HTypeError("position", position, int)
+        
+        if not isinstance(value, int):
+            raise HTypeError("value", value, int)
+        
+        if length is not None and not isinstance(length, int):
+            raise HTypeError("length", length, int, None)
+        
+        if position < 0:
+            raise HFormatError("Parameter position and "
+            "length expected a non-negative integer.")
+
+        if length is None:
+            length = value.bit_length()
+
+        if length <= 0:
+            raise HFormatError("Parameter length expected a positive integer.")
+
+        if position - length + 1 < 0:
+            raise BitwiseError("You cannot access {} "
+            "bits starting from {}-th position.".format(length, position))
     
     @staticmethod
     def max_natural_number(bit_length: int):
@@ -74,41 +118,23 @@ class Bitwise(object):
         Example: `max_natural_number(8) = 255`.
         """
 
-        if not isinstance(bit_length, int) or bit_length <= 0:
-            raise InvalidParameterError("Parameter bit_length "
-            "must be an int and larger than 0");
+        if not isinstance(bit_length, int):
+            raise HTypeError("bit_length", bit_length, int);
+
+        if  bit_length <= 0:
+            raise HFormatError("Parameter bit_length expected a positive integer.")
 
         return ~(1 << bit_length) + (1 << (bit_length + 1))
 
     @staticmethod
     def turn_on_bits(number: int, position: int, length: int = 1):
-        if not isinstance(number, int)\
-            or not isinstance(position, int)\
-            or not isinstance(length, int):
-            raise InvalidParameterError("Paramters must be int.")
-        
-        if position < 0 or length <=0:
-            raise InvalidParameterError("Expect position >= 0 and length > 0.")
-
-        if position - length + 1 < 0:
-            raise InvalidBitsLengthMathError("You cannot access {} "
-            "bits starting from {}-th position.".format(length, position))
+        Bitwise.__validate(number, position, length)
 
         return number | (Bitwise.max_natural_number(length) << (position - length + 1))
 
     @staticmethod
     def turn_off_bits(number: int, position: int, length: int = 1):
-        if not isinstance(number, int)\
-            or not isinstance(position, int)\
-            or not isinstance(length, int):
-            raise InvalidParameterError("Paramters must be int.")
-        
-        if position < 0 or length <=0:
-            raise InvalidParameterError("Expect position >= 0 and length > 0.")
-        
-        if position - length + 1 < 0:
-            raise InvalidBitsLengthMathError("You cannot access {} "
-            "bits starting from {}-th position.".format(length, position))
+        Bitwise.__validate(number, position, length)
 
         return number & (~(Bitwise.max_natural_number(length) << (position - length + 1)))
 
@@ -116,22 +142,10 @@ class Bitwise(object):
     def set_bits(number: int, position: int, value: int, length: int = None):
         """Set `length` bits begining from the `position`
         in the `the number` to the `value`."""        
-
-        if not isinstance(number, int)\
-            or not isinstance(position, int)\
-            or not isinstance(value, int)\
-            or (length is not None and not isinstance(length, int)):
-            raise InvalidParameterError("Paramters must be int.")
+        Bitwise.__validate(number, position, length, value)
                 
         if length is None:
             length = value.bit_length()
-
-        if position < 0 or length <=0:
-            raise InvalidParameterError("Expect position >= 0 and length > 0.")
-
-        if position - length + 1 < 0:
-            raise InvalidBitsLengthMathError("You cannot access {} "
-            "bits starting from {}-th position.".format(length, position))
 
         number = Bitwise.turn_off_bits(number, position, length)
 
@@ -142,18 +156,7 @@ class Bitwise(object):
     @staticmethod
     def get_bits(number: int, position: int, length: int):
         "Get `length` bits beginning from the `position` bit in the `number`."
-
-        if not isinstance(number, int)\
-            or not isinstance(position, int)\
-            or not isinstance(length, int):
-            raise InvalidParameterError("Paramters must be int.")
-        
-        if position < 0 or length <=0:
-            raise InvalidParameterError("Expect position >= 0 and length > 0.")
-        
-        if position - length + 1 < 0:
-            raise InvalidBitsLengthMathError("You cannot access {} "
-            "bits starting from {}-th position.".format(length, position))
+        Bitwise.__validate(number, position, length)
         
         number = number >> (position - length + 1)
         

@@ -1,13 +1,10 @@
-from hks_pylib.errors import HKSError
+from hks_pylib.errors import HKSPylibError
 
 
-class HTTPError(HKSError):
-    "Exception is raised by failures in http module."
+class HTTPError(HKSPylibError):
+    "The exception is raised by failures in http module."
 
 
-class UnknownHTTPTypeError(HTTPError):
-    "Exception is raised when you pass unknown http type as a parameter."
+class HTTPTypeError(HTTPError):
+    "The exception is raised when an invalid http type appears."
 
-
-class InvalidHTTPKeyFieldError(HTTPError):
-    "Exception is raised when you indicate a invalid key."

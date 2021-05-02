@@ -8,13 +8,17 @@ def packet():
 
 
 def test_read_http(packet):
-    reader = http.HTTPParser()
-    reader.parse(packet)
+    packet = http.HTTPParser.parse(packet)
+    print(packet)
+    print(packet.to_byte())
 
 
 def write_http():
-    a = http.HTTPGenerator()
-    a.type = http.HTTPType.RESPONSE
-    a.set_start_line(protocol_version="HTTP/1.1", status_code="200", status_text="OK")
-    a.add_header("Agent", "LeuLeu")
-    return a.generate()
+    a = http.HTTPPacket()
+    a.type(http.HTTPType.RESPONSE)
+    a[http.HTTPRESPONSE.PROTOCOL_VERSION] =  "HTTP/1.1"
+    a[http.HTTPRESPONSE.STATUS_CODE] = "200"
+    a[http.HTTPRESPONSE.STATUS_TEXT] = "OK"
+    a.update_header("Agent", "LeuLeu")
+    a.body("huy thong minh nhat ne")
+    return a.to_byte()

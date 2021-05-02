@@ -1,5 +1,6 @@
 from typing import Optional
-from hks_pylib.errors import InvalidParameterError
+
+from hkserror import HTypeError
 
 
 class Done(object):
@@ -14,7 +15,7 @@ class Done(object):
 
     def copy(self, other, overwrite: bool = True):
         if not isinstance(other, Done):
-            raise InvalidParameterError("Parameter other must be a Done object.")
+            raise HTypeError("other", other, Done)
 
         for key in other.__attributes.keys():
             if (key in self.__attributes.keys() and overwrite) or (key not in self.__attributes.keys()):
@@ -27,5 +28,14 @@ class Done(object):
     def __eq__(self, o: object) -> bool:
         return o == self.value
 
+    def __ne__(self, o: object) -> bool:
+        return o != self.value
+
     def __str__(self) -> str:
-        return str(self.__attributes)
+        if self.__attributes:
+            return "{} ({})".format(self.value, self.__attributes)
+        else:
+            return "{}".format(self.value)
+
+    def __bool__(self):
+        return self.value

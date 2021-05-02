@@ -58,7 +58,7 @@ def test_signed_quantizer():
             assert False
 
         assert abs(dfsum - (f1 + f2)) <= 1e-2
-    except OverflowIntegerError:
+    except (OverflowIntegerError, OverflowQuantizerError):
         if f1 + f2 >= -frange and f1 + f2 <= frange:
             assert False
 

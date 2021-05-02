@@ -1,3 +1,4 @@
+from hkserror.hkserror import HFormatError
 from hks_pylib.math import ceil_div
 from hks_pylib.hksenum import HKSEnum
 
@@ -10,11 +11,12 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.hazmat.primitives.asymmetric import padding
 
-from hks_pylib.errors import InvalidParameterError, UnknownHKSError
-from hks_pylib.errors.cryptography.ciphers import NotFinalizeCipherError
-from hks_pylib.errors.cryptography.ciphers import InvalidCipherParameterError
-from hks_pylib.errors.cryptography.ciphers import NotExistKeyError, NotResetCipherError
-from hks_pylib.errors.cryptography.ciphers.asymmetrics import InvalidEncodingError
+from hkserror import HTypeError
+from hks_pylib.errors.cryptography import ResetError
+from hks_pylib.errors.cryptography.ciphers import KeyError
+from hks_pylib.errors.cryptography.ciphers import FinalizeCipherError
+from hks_pylib.errors.cryptography.ciphers import CipherParameterError
+from hks_pylib.errors.cryptography.ciphers.asymmetrics import AsymmetricError, EncodingError
 
 
 class Encoding(HKSEnum):
@@ -23,25 +25,30 @@ class Encoding(HKSEnum):
 
 
 class RSAKey(object):
-    def __init__(self, encoding: str = Encoding.PEM.value) -> None:
+    def __init__(self, encoding: Encoding = Encoding.PEM) -> None:
         super().__init__()
-        if encoding not in Encoding.values():
-            raise InvalidParameterError("Parameter encoding must be an value "
-            "in {} (e.g. Encoding.PEM.value).".format(Encoding.values()))
+        if not isinstance(encoding, Encoding):
+            raise HTypeError("encoding", encoding, Encoding)
 
         self._encoding = encoding
         self.__private_key = None
         self.__public_key = None
 
-    def generate(self, keysize, e=65537):
+    def generate(self, keysize: int, e: int = 65537):
+        if not isinstance(keysize, int):
+            raise HTypeError("keysize", keysize, int)
+
+        if not isinstance(e, int):
+            raise HTypeError("e", e, int)
+
         if keysize < 1024:
-            raise InvalidParameterError("Expected a larger rsa key (>=1024 bytes).")
+            raise HFormatError("Expected a larger rsa key (>=1024 bytes).")
 
         self.__private_key = rsa.generate_private_key(
-            public_exponent=e,
-            key_size=keysize,
-            backend=default_backend()
-        )
+                public_exponent=e,
+                key_size=keysize,
+                backend=default_backend()
+            )
         
         self.__public_key = self.__private_key.public_key()
 
@@ -56,7 +63,7 @@ class RSAKey(object):
     @property
     def key_size(self):
         if not self.__private_key and not self.__public_key:
-            raise NotExistKeyError("Please import (generate/load/deserialize) "
+            raise KeyError("Please import (generate/load/deserialize) "
             "a key before getting key_size.")
     
         if self.__private_key:
@@ -74,18 +81,18 @@ class RSAKey(object):
             encryption_algorithm = serialization.BestAvailableEncryption(password)
 
         return self.__private_key.private_bytes(
-            encoding=self._encoding,
+            encoding=self._encoding.value,
             format=_format,
             encryption_algorithm=encryption_algorithm
         )
 
     def deserialize_private_key(self, data: bytes, password: bytes = None):
-        if self._encoding == serialization.Encoding.PEM:
+        if self._encoding.value == serialization.Encoding.PEM:
             _load_private_key = serialization.load_pem_private_key
-        elif self._encoding == serialization.Encoding.DER:
+        elif self._encoding.value == serialization.Encoding.DER:
             _load_private_key = serialization.load_der_private_key
         else:
-            raise InvalidEncodingError("Invalid encoding ({}), please choose an encoding in "
+            raise EncodingError("Invalid encoding ({}), please choose an encoding in "
             "hks_pylib.cryptography.ciphers.asymmetrics.Encoding.".format(self._encoding))
         
         self.__private_key = _load_private_key(
@@ -104,17 +111,17 @@ class RSAKey(object):
 
     def serialize_public_key(self):
         return self.__public_key.public_bytes(
-            encoding=self._encoding,
+            encoding=self._encoding.value,
             format=serialization.PublicFormat.SubjectPublicKeyInfo
         )
 
     def deserialize_public_key(self, data: bytes):
-        if self._encoding == serialization.Encoding.PEM:
+        if self._encoding.value == serialization.Encoding.PEM:
             _load_public_key = serialization.load_pem_public_key
-        elif self._encoding == serialization.Encoding.DER:
+        elif self._encoding.value == serialization.Encoding.DER:
             _load_public_key = serialization.load_der_public_key
         else:
-            raise InvalidEncodingError("Invalid encoding ({}), please choose an encoding in "
+            raise EncodingError("Invalid encoding ({}), please choose an encoding in "
             "hks_pylib.cryptography.ciphers.asymmetrics.Encoding.".format(self._encoding))
 
         self.__public_key = _load_public_key(data=data)
@@ -142,7 +149,7 @@ class RSACipher(HKSCipher):
                 hash_algorithm: hashes.HashAlgorithm = hashes.SHA256
             ) -> None:
         if not isinstance(key, RSAKey):
-            raise InvalidParameterError("Parameter key must be a RSAKey object.")
+            raise HTypeError("key", key, RSAKey)
 
         super().__init__(key, number_of_params=0)
         self._key: RSAKey
@@ -163,10 +170,10 @@ class RSACipher(HKSCipher):
         ciphertext = self._key.public_key.encrypt(
                 plaintext,
                 padding.OAEP(
-                    mgf=padding.MGF1(self._hash_algorithm()),
-                    algorithm=self._hash_algorithm(),
-                    label=None
-                ),
+                        mgf=padding.MGF1(self._hash_algorithm()),
+                        algorithm=self._hash_algorithm(),
+                        label=None
+                    ),
             )
         return ciphertext
 
@@ -183,14 +190,14 @@ class RSACipher(HKSCipher):
 
     def encrypt(self, plaintext: bytes, finalize: bool = True):
         if not isinstance(plaintext, bytes):
-            raise InvalidParameterError("Parameter plaintext must be a bytes object.")
+            raise HTypeError("plaintext", plaintext, bytes)
 
         if self._in_process is CipherProcess.NONE:
             self._in_process = CipherProcess.ENCRYPT
             self._data = b""
 
         if self._in_process is not CipherProcess.ENCRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
             "before calling encrypt().".format(self._in_process.name))
 
         self._data += plaintext
@@ -208,12 +215,15 @@ class RSACipher(HKSCipher):
         return ciphertext
 
     def decrypt(self, ciphertext: bytes, finalize: bool = True):
+        if not isinstance(ciphertext, bytes):
+            raise HTypeError("ciphertext", ciphertext, bytes)
+
         if self._in_process is CipherProcess.NONE:
             self._in_process = CipherProcess.DECRYPT
             self._data = b""
 
         if self._in_process is not CipherProcess.DECRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
             "before calling decrypt().".format(self._in_process.name))
 
         self._data += ciphertext
@@ -233,7 +243,7 @@ class RSACipher(HKSCipher):
     def finalize(self) -> bytes:
         if self._in_process is CipherProcess.ENCRYPT:
             if len(self._data) > self._max_plaintext_size:
-                raise UnknownHKSError("The size of remaining plaintext is too "
+                raise AsymmetricError("The size of remaining plaintext is too "
                 "large (expected <= {} bytes, but passed {} "
                 "bytes.)".format(self._max_plaintext_size, len(self._data)))
 
@@ -241,31 +251,31 @@ class RSACipher(HKSCipher):
 
         elif self._in_process is CipherProcess.DECRYPT:            
             if len(self._data) > self._keysize:
-                raise UnknownHKSError("The size of remaining ciphertext is too "
+                raise AsymmetricError("The size of remaining ciphertext is too "
                 "large (expected <= {} bytes, but passed {} "
                 "bytes.)".format(self._keysize, len(self._data)))
 
             finaltext = self._raw_decrypt(self._data)
 
         elif self._in_process is CipherProcess.FINALIZED:
-            raise NotResetCipherError("Unknown process in your object "
+            raise ResetError("Unknown process in your object "
             "({}).".format(self._in_process.name))
         else:
-            raise UnknownHKSError("Unknown process ({}).".format(self._in_process.name))
+            raise AsymmetricError("Unknown process ({}).".format(self._in_process.name))
 
         self._data = None
         self._in_process = CipherProcess.FINALIZED
         return finaltext
 
     def set_param(self, index: int, value: bytes) -> None:
-        raise InvalidCipherParameterError("RSA has no parameter.")
+        raise CipherParameterError("RSA has no parameter.")
 
     def get_param(self, index: int, value: bytes) -> None:
-        raise InvalidCipherParameterError("RSA has no parameter.")
+        raise CipherParameterError("RSA has no parameter.")
 
     def reset(self, auto_renew_params: bool = True) -> bool:
         if self._in_process not in (CipherProcess.NONE, CipherProcess.FINALIZED):
-            raise NotFinalizeCipherError("Please finalize() the process before calling reset().")
+            raise FinalizeCipherError("Please finalize() the process before calling reset().")
 
         self._in_process = CipherProcess.NONE
         self._data = b""

@@ -1,8 +1,9 @@
+from typing import Type
+from hkserror.hkserror import HTypeError
 from hks_pylib.cryptography.ciphers import HKSCipher
 from hks_pylib.cryptography.hashes import SHA1, SHA256, HKSHash
 
-from hks_pylib.errors import InvalidParameterError
-from hks_pylib.errors.cryptography.ciphers.cipherid import ExistedCipherIDError
+from hks_pylib.errors.cryptography.ciphers.cipherid import CipherIDError
 
 
 __default_sha1 = SHA1()
@@ -10,10 +11,16 @@ __default_sha256 = SHA256()
 
 
 def hash_cls_name(
-            obj,
+            obj: object,
             hash_obj_1: HKSHash = __default_sha1,
             hash_obj_2: HKSHash = __default_sha256
         ) -> bytes:
+    if not isinstance(hash_obj_1, HKSHash):
+        raise HTypeError("hash_obj_1", hash_obj_1, HKSHash)
+
+    if not isinstance(hash_obj_2, HKSHash):
+        raise HTypeError("hash_obj_2", hash_obj_2, HKSHash)
+
     if type(obj).__name__ == 'type' or\
         type(obj).__name__ == 'builtin_function_or_method':
         cls_name = str(obj).split(".")[-1][:-2].encode()
@@ -42,13 +49,12 @@ class CipherID(object):
     _cipher_names_invert = {}
 
     @staticmethod
-    def register(cipher_cls):
+    def register(cipher_cls: Type[HKSCipher]):
         if not issubclass(cipher_cls, HKSCipher):
-            raise InvalidParameterError("Parameter cipher_cls "
-            "must be a subclass of HKSCipher.")
+            raise HTypeError("cipher_cls", cipher_cls, Type[HKSCipher])
 
         if hash_cls_name(cipher_cls) in CipherID._cipher_hashs.keys():
-            raise ExistedCipherIDError()
+            raise CipherIDError()
 
         CipherID._cipher_hashs[hash_cls_name(cipher_cls)] = cipher_cls
         CipherID._cipher_names[cipher_cls.__name__] = cipher_cls

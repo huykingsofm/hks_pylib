@@ -1,9 +1,9 @@
+from hkserror.hkserror import HFormatError, HTypeError
 from hks_pylib.math import Bitwise
 
 from hks_pylib.cryptography.batchcrypt.integer import SignedInteger
 from hks_pylib.cryptography.batchcrypt.quantization import Quantizer
 
-from hks_pylib.errors import InvalidParameterError
 from hks_pylib.errors.cryptography.batchcrypt.batchnumber import *
 from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
 
@@ -17,9 +17,11 @@ class BatchNumber(object):
 
     @staticmethod
     def set_padding_size(value: int):
-        if not isinstance(value, int) or value < 0:
-            raise InvalidParameterError("Padding size must be a "
-            "positive int.")
+        if not isinstance(value, int):
+            raise HTypeError("value", value, int)
+
+        if value <= 0:
+            raise HFormatError("Parameter error expected an positive integer.")
 
         BatchNumber.__PADDING_SIZE = value
 
@@ -38,10 +40,10 @@ class BatchNumber(object):
 
     def get(self, index: int) -> int:
         if not isinstance(index, int):
-            raise InvalidElementBatchNumberError("Parameter index must be an int.")
+            raise BatchNumberError("Parameter index must be an int.")
 
         if index >= len(self) or index < 0:
-            raise InvalidElementBatchNumberError("You can only access elements "
+            raise BatchNumberError("You can only access elements "
             "starting from 0 to {}".format(len(self) - 1))
 
         return Bitwise.get_bits(
@@ -73,19 +75,17 @@ class BatchNumber(object):
 
     def __add__(self, other):
         if not isinstance(other, type(self)):
-            return InvalidParameterError("Two operands "
-            "must be the same type ({} != {}).".format(
-                type(self).__name__, type(other).__name__))
+            return HTypeError("other", other, type(self))
 
         if len(self) != len(other):
-            raise MismatchedTypeBatchNumberError("Two operands "
+            raise BatchNumberError("Two operands "
             "must be the same number of elements ({} != {}).".format(
                     len(self),
                     len(other)
                 ))
 
         if self.element_size() != other.element_size():
-            raise MismatchedTypeBatchNumberError("Two operands "
+            raise BatchNumberError("Two operands "
             "must be the same element length ({} != {}).".format(
                     self.element_size(),
                     other.element_size()
@@ -100,19 +100,17 @@ class BatchNumber(object):
     
     def __iadd__(self, other):
         if not isinstance(other, type(self)):
-            return InvalidParameterError("Two operands "
-            "must be the same type ({} != {}).".format(
-                type(self).__name__, type(other).__name__))
+            return HTypeError("other", other, type(self))
 
         if len(self) != len(other):
-            raise MismatchedTypeBatchNumberError("Two operands "
+            raise BatchNumberError("Two operands "
             "must be the same number of elements ({} != {}).".format(
                     len(self),
                     len(other)
                 ))
 
         if self.element_size() != other.element_size():
-            raise MismatchedTypeBatchNumberError("Two operands "
+            raise BatchNumberError("Two operands "
             "must be the same element length ({} != {}).".format(
                     self.element_size(),
                     other.element_size()
@@ -172,8 +170,7 @@ class GenericBatchNumber(BatchNumber):
 
     def __add__(self, other: BatchNumber):
         if not isinstance(other, type(self)):
-            raise InvalidParameterError("Operands of addition "
-            "must be {} objects.".format(type(self).__name__))
+            raise HTypeError("other", other, type(self))
 
         result = super().__add__(other)
         result = GenericBatchNumber(
@@ -186,8 +183,7 @@ class GenericBatchNumber(BatchNumber):
 
     def __iadd__(self, other: BatchNumber):
         if not isinstance(other, type(self)):
-            raise InvalidParameterError("Operands of addition "
-            "must be {} objects.".format(type(self).__name__))
+            raise HTypeError("other", other, type(self))
 
         super().__iadd__(other)
         self._n_cumulative += other._n_cumulative
@@ -201,10 +197,14 @@ class SignedBatchNumber(BatchNumber):
 
     @staticmethod
     def quantizer(float_range: tuple, int_size: int):
-        if not isinstance(float_range, tuple) or len(float_range) != 2\
-            or sum(float_range) != 0:
-            raise InvalidParameterError("Float range "
-            "in signed batch number must be symmetric")
+        if not isinstance(float_range, tuple):
+            raise HTypeError("float_range", float_range, tuple)
+
+        if len(float_range) != 2 or sum(float_range) != 0:
+            raise HFormatError("Parameter float_range must be a symmetric pair.")
+
+        if not isinstance(int_size, int):
+            raise HTypeError("int_size", int_size, int)
 
         SignedBatchNumber.__quantizer.set_float_range(*float_range)
         SignedBatchNumber.__quantizer.set_int_size(

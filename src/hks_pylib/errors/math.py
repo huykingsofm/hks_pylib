@@ -1,9 +1,8 @@
-from hks_pylib.errors import HKSError
+from hks_pylib.errors import HKSPylibError
 
-class MathError(HKSError):
-    "Exception is raised by failures in math module."
+class MathError(HKSPylibError):
+    "The exception is raised by failures in math module."
     pass
 
-
-class InvalidBitsLengthMathError(MathError):
-    "Exception is raised when you access invalid range of bits."
+class BitwiseError(MathError):
+    "The exception is raised by failures in Bitwise operation."

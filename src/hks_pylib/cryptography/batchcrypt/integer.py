@@ -1,9 +1,9 @@
+from hkserror.hkserror import HFormatError, HTypeError
 from hks_pylib.math import Bitwise
 
-from hks_pylib.errors import InvalidParameterError
 from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
-from hks_pylib.errors.cryptography.batchcrypt.integer import OutOfRangeIntegerError
-from hks_pylib.errors.cryptography.batchcrypt.integer import MismatchedSizeIntegerError
+from hks_pylib.errors.cryptography.batchcrypt.integer import OverflowIntegerError
+from hks_pylib.errors.cryptography.batchcrypt.integer import IntegerError
 
 class SignedInteger(object):
     __SIGN_SIZE = 2
@@ -14,9 +14,11 @@ class SignedInteger(object):
 
     @staticmethod
     def set_sign_size(value: int):
-        if not isinstance(value, int) or value < 1:
-            raise InvalidParameterError("Sign size must be a "
-            "int larger than 0.")
+        if not isinstance(value, int):
+            raise HTypeError("value", value, int)
+
+        if value < 1:
+            raise HFormatError("The parameter value expected an positive integer.")
 
         SignedInteger.__SIGN_SIZE = value
 
@@ -56,7 +58,7 @@ class SignedInteger(object):
         value_size = size - SignedInteger.sign_size()
 
         if SignedInteger.is_out_of_range(number, size):
-            raise OutOfRangeIntegerError("Imported number is out "
+            raise OverflowIntegerError("Imported number is out "
             "of range (signed integer {}-bit)".format(size))
 
         actual_number = Bitwise.get_bits(
@@ -138,11 +140,10 @@ class SignedInteger(object):
 
     def __ops__(self, other, operator):
         if not isinstance(other, type(self)):
-            raise InvalidParameterError("Parameter of "
-            "arithmetic operator must be {} objects.".format(type(self).__name__))
+            raise HTypeError("other", other, type(self))
 
         if self.size() != other.size():
-            raise MismatchedSizeIntegerError("Two operands must be "
+            raise IntegerError("Two operands must be "
             "the same size ({} != {}).".format(self.size(), other.size()))
 
         raw_result = operator(self.raw(), other.raw())

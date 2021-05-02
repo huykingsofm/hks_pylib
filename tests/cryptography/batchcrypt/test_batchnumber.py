@@ -19,7 +19,7 @@ def test_batchnumber():
     try:
         a.get(3)
         assert False
-    except InvalidElementBatchNumberError:
+    except BatchNumberError:
         pass
 
     assert b[0] == 2

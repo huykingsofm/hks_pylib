@@ -1,7 +1,6 @@
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
-
-from hks_pylib.errors import InvalidParameterError
+from hkserror.hkserror import HTypeError
 
 
 class HKSHash(object):
@@ -26,23 +25,24 @@ class HKSHash(object):
 class BuiltinHash(HKSHash):
     def __init__(self, algorithm: hashes.HashAlgorithm) -> None:
         if not isinstance(algorithm, hashes.HashAlgorithm):
-            raise InvalidParameterError("Parameter algorithm must be a HashAlgorithm object.")
+            raise HTypeError("algorithm", algorithm, hashes.HashAlgorithm)
 
         self._algorithm = algorithm
         self._digest = hashes.Hash(self._algorithm, default_backend())
     
     def update(self, msg: bytes):
         if not isinstance(msg, bytes):
-            raise InvalidParameterError("Parameter msg must be a bytes object.")
+            raise HTypeError("msg", msg, bytes)
 
         self._digest.update(msg)
    
     def finalize(self, msg: bytes = None) -> bytes:
         if msg is not None and not isinstance(msg, bytes):
-            raise InvalidParameterError("Parameter msg must be a bytes object.")
+            raise HTypeError("msg", msg, bytes, None)
 
         if msg is not None:
             self.update(msg)
+
         return self._digest.finalize()
 
     def reset(self):

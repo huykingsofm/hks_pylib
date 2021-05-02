@@ -1,7 +1,7 @@
 from enum import Enum
-from typing import Type
+from typing import Iterable, Type
 
-from hks_pylib.errors import InvalidParameterError
+from hkserror.hkserror import HTypeError
 
 
 class HKSEnum(Enum):
@@ -15,6 +15,12 @@ class _Default(HKSEnum):
 
 
 class HKSEnum(Enum):
+    def __repr__(self) -> str:
+        return str(self)
+
+    def __str__(self) -> str:
+        return "{}.{}".format(type(self).__name__, self.name)
+
     @classmethod
     def values(cls):
         try:
@@ -49,9 +55,9 @@ class Default(HKSEnum):
 unknown = Default.unknown
 
 
-def get_enum(cls: Type[Enum], obj: object, default: object = unknown):
-    if not issubclass(cls, Enum):
-        raise InvalidParameterError("Parameter cls must be a subclass of Enum.")
+def get_enum(cls: Iterable, obj: object, default: object = unknown):
+    if not isinstance(cls, Iterable) and not issubclass(cls, Enum):
+        raise HTypeError("cls", cls, Iterable, Type[Enum])
 
     if default == _Default.unknown:
         default = Default.unknown

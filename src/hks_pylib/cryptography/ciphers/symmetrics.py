@@ -1,5 +1,7 @@
 import os
-from hks_pylib.errors.cryptography.ciphers import NotExistKeyError
+
+from hkserror.hkserror import HTypeError
+from hks_pylib.errors.cryptography.ciphers import KeyError
 
 from hks_pylib.math import bxor
 
@@ -11,12 +13,11 @@ from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.ciphers import Cipher, CipherContext, algorithms, modes
 
-from hks_pylib.errors import UnknownHKSError, InvalidParameterError
-from hks_pylib.errors.cryptography.ciphers import NotResetCipherError
-from hks_pylib.errors.cryptography.ciphers import InvalidCipherParameterError
-from hks_pylib.errors.cryptography.ciphers import NotFinalizeCipherError
-from hks_pylib.errors.cryptography.ciphers import NotEnoughCipherParameterError
-from hks_pylib.errors.cryptography.ciphers.symmetrics import UnAuthenticatedPacketError
+from hks_pylib.errors.cryptography import ResetError
+from hks_pylib.errors.cryptography.ciphers import CipherParameterError
+from hks_pylib.errors.cryptography.ciphers import FinalizeCipherError
+from hks_pylib.errors.cryptography.ciphers import CipherParameterError
+from hks_pylib.errors.cryptography.ciphers.symmetrics import SymmetricError, UnAuthenticatedPacketError
 
 
 @CipherID.register
@@ -32,10 +33,10 @@ class NoCipher(HKSCipher):
         return b""
 
     def set_param(self, index, value):
-        raise InvalidCipherParameterError("Index exceeds (NoCipher doesn't use any parameters).")
+        raise CipherParameterError("Index exceeds (NoCipher doesn't use any parameters).")
 
     def get_param(self, index):
-        raise InvalidCipherParameterError("Index exceeds (NoCipher doesn't use any parameters).")
+        raise CipherParameterError("Index exceeds (NoCipher doesn't use any parameters).")
 
     def reset(self, auto_renew_params: bool = True):
         # Do nothing
@@ -47,7 +48,7 @@ class XorCipher(HKSCipher):
     "Encrypt the payload using xor operator: c = p xor key"
     def __init__(self, key: bytes):
         if not isinstance(key, bytes) :
-            raise InvalidParameterError("Key of XorCipher must a bytes object.")
+            raise HTypeError("key", key, bytes)
 
         super().__init__(key, 1)
         self._in_process: CipherProcess = CipherProcess.NONE
@@ -56,21 +57,21 @@ class XorCipher(HKSCipher):
 
     def encrypt(self, plaintext: bytes, finalize=True) -> bytes:
         if not isinstance(plaintext, bytes):
-            raise InvalidParameterError("Paramter plaintext must be a bytes object.")
+            raise HTypeError("plaintext", plaintext, bytes)
 
         if not self._key:
-            raise NotExistKeyError("Please provide key before calling encrypt()")
+            raise KeyError("Please provide key before calling encrypt()")
 
         if self._in_process is CipherProcess.NONE:
             self._in_process = CipherProcess.ENCRYPT
             self._data = b""
         
         if self._in_process is not CipherProcess.ENCRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
                 "before calling encrypt().".format(self._in_process.name))
 
         if self._iv is None:
-            raise NotEnoughCipherParameterError("IV has not been set yet.")
+            raise CipherParameterError("IV has not been set yet.")
 
         self._data += plaintext
         ciphertext = b""
@@ -86,21 +87,21 @@ class XorCipher(HKSCipher):
 
     def decrypt(self, ciphertext: bytes, finalize=True) -> bytes:
         if not isinstance(ciphertext, bytes):
-            raise InvalidParameterError("Parameter ciphertext must be a bytes object.")
+            raise HTypeError("ciphertext", ciphertext, bytes)
   
         if not self._key:
-            raise NotExistKeyError("Please provide key before calling decrypt()")
+            raise KeyError("Please provide key before calling decrypt()")
 
         if self._in_process is CipherProcess.NONE:
             self._in_process = CipherProcess.DECRYPT
             self._data = b""
         
         if self._in_process is not CipherProcess.DECRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
             "before calling decrypt().".format(self._in_process.name))
 
         if self._iv is None:
-            raise NotEnoughCipherParameterError("IV has not yet been set.")
+            raise CipherParameterError("IV has not yet been set.")
 
         self._data += ciphertext
         plaintext = b""
@@ -123,22 +124,22 @@ class XorCipher(HKSCipher):
 
     def set_param(self, index: int, value: bytes) -> None:
         if not isinstance(value, bytes):
-            raise InvalidParameterError("Paramter value must be a bytes object.")
+            raise HTypeError("value", value, bytes)
 
         if index == 0:
             if len(value) != len(self._key):
-                raise InvalidCipherParameterError("IV of XorCipher must be a bytes object "
+                raise CipherParameterError("IV of XorCipher must be a bytes object "
                 "which is the same size as the key.")
             else:
                 self._iv = value
         else:
-            raise InvalidCipherParameterError("Index exceeds (XorCipher use only one parameter).")
+            raise CipherParameterError("Index exceeds (XorCipher use only one parameter).")
 
     def get_param(self, index: int) -> bytes:
         if index == 0:
             return self._iv
 
-        raise InvalidCipherParameterError("XorCipher use only one parameter.")
+        raise CipherParameterError("XorCipher use only one parameter.")
 
     def reset(self, auto_renew_params: bool = True):
         if auto_renew_params:
@@ -153,10 +154,14 @@ class XorCipher(HKSCipher):
 @CipherID.register
 class AES_CTR(HKSCipher):
     def __init__(self, key: bytes):
+        if not isinstance(key, bytes):
+            raise HTypeError("key", key, bytes)
+
         if len(key) * 8 not in algorithms.AES.key_sizes:
-            raise InvalidCipherParameterError("Key size of AES must be in {}, not {}.".format(
+            raise CipherParameterError("Key size of AES must be in {} (bits), "
+            "not {} (bytes).".format(
                 set(algorithms.AES.key_sizes),
-                len(key) * 8
+                len(key)
             ))
 
         super().__init__(key, number_of_params=1)
@@ -167,14 +172,13 @@ class AES_CTR(HKSCipher):
 
     def encrypt(self, plaintext: bytes, finalize=True) -> bytes:
         if not isinstance(plaintext, bytes):
-            raise InvalidParameterError("Parameter plaintext must be "
-            "a bytes object.")
+            raise HTypeError("plaintext", plaintext, bytes)
 
         if not self._key:
-            raise NotExistKeyError("Please provide key before calling encrypt()")
+            raise KeyError("Please provide key before calling encrypt()")
 
         if self._aes is None:
-            raise NotEnoughCipherParameterError("Please set nonce "
+            raise CipherParameterError("Please set nonce "
             "value before calling encrypt().")
 
         if self._in_process is CipherProcess.NONE:
@@ -182,7 +186,7 @@ class AES_CTR(HKSCipher):
             self._encryptor = self._aes.encryptor()
 
         if self._in_process is not CipherProcess.ENCRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
             "before calling encrypt().".format(self._in_process.name))
 
         ciphertext = self._encryptor.update(plaintext)
@@ -194,15 +198,14 @@ class AES_CTR(HKSCipher):
 
     def decrypt(self, ciphertext: bytes, finalize=True) -> bytes:
         if not isinstance(ciphertext, bytes):
-            raise InvalidParameterError("Parameter ciphertext "
-            "must be a bytes object.")
+            raise HTypeError("ciphertext", ciphertext, bytes)
 
         if not self._key:
-            raise NotExistKeyError("Please provide key before "
+            raise KeyError("Please provide key before "
             "calling decrypt()")
 
         if self._aes is None:
-            raise NotEnoughCipherParameterError("Please set nonce "
+            raise CipherParameterError("Please set nonce "
             "value before calling decrypt().")
 
         if self._in_process is CipherProcess.NONE:
@@ -210,7 +213,7 @@ class AES_CTR(HKSCipher):
             self._decryptor = self._aes.decryptor()
 
         if self._in_process is not CipherProcess.DECRYPT:
-            raise NotResetCipherError("You are in {} process, please "
+            raise ResetError("You are in {} process, please "
             "call reset() before calling decrypt()".format(self._in_process.name))
         
         plaintext = self._decryptor.update(ciphertext)
@@ -222,7 +225,7 @@ class AES_CTR(HKSCipher):
 
     def finalize(self) -> bytes:
         if self._aes is None:
-            raise NotEnoughCipherParameterError("Please set nonce value "
+            raise CipherParameterError("Please set nonce value "
             "before calling finalize().")
 
         if self._in_process is CipherProcess.ENCRYPT:
@@ -234,22 +237,22 @@ class AES_CTR(HKSCipher):
             self._decryptor = None
 
         elif self._in_process is CipherProcess.FINALIZED:
-            raise NotResetCipherError("Unknown process in your object "
+            raise ResetError("Unknown process in your object "
             "({}).".format(self._in_process.name))
         else:
-            raise UnknownHKSError("Unknown process ({}).".format(self._in_process.name))
+            raise SymmetricError("Unknown process ({}).".format(self._in_process.name))
 
         self._in_process = CipherProcess.FINALIZED
         return finaltext
 
     def set_param(self, index: int, param: bytes) -> None:
         if not isinstance(param, bytes):
-            raise InvalidCipherParameterError("Parameters of AES must "
+            raise CipherParameterError("Parameters of AES must "
             "be a bytes object.")
 
         if index == 0:
             if len(param) * 8 != algorithms.AES.block_size:
-                raise InvalidCipherParameterError("Invalid length of nonce "
+                raise CipherParameterError("Invalid length of nonce "
                 "value ({} bits), expected less than {} bits.".format(
                         len(param) * 8,
                         algorithms.AES.block_size
@@ -262,19 +265,19 @@ class AES_CTR(HKSCipher):
                 default_backend()
             )
         else:
-            raise InvalidCipherParameterError("AES only use the nonce "
+            raise CipherParameterError("AES only use the nonce "
             "value as its parameter.")
 
     def get_param(self, index) -> bytes:
         if index == 0:
             return self._nonce
         else:
-            raise InvalidCipherParameterError("AES only use the nonce "
+            raise CipherParameterError("AES only use the nonce "
             "value as its parameter.")
 
     def reset(self, auto_renew_params: bool = True):
         if self._in_process not in (CipherProcess.NONE, CipherProcess.FINALIZED):
-            raise NotFinalizeCipherError("Please finalize() the process "
+            raise FinalizeCipherError("Please finalize() the process "
             "before calling reset().")
 
         if auto_renew_params:
@@ -291,11 +294,14 @@ class AES_CTR(HKSCipher):
 @CipherID.register
 class AES_CBC(HKSCipher):
     def __init__(self, key: bytes):
+        if not isinstance(key, bytes):
+            raise HTypeError("key", key, bytes)
+
         if len(key) * 8 not in algorithms.AES.key_sizes:
-            raise InvalidCipherParameterError("Key size of AES must be "
-            "in {}, not {}.".format(
+            raise CipherParameterError("Key size of AES must be "
+            "in {} (bits), not {} (bytes).".format(
                 set(algorithms.AES.key_sizes),
-                len(key) * 8
+                len(key)
             ))
         super().__init__(key, number_of_params=1)
         self._aes = None
@@ -310,13 +316,13 @@ class AES_CBC(HKSCipher):
 
     def encrypt(self, plaintext: bytes, finalize=True) -> bytes:
         if not isinstance(plaintext, bytes):
-            raise InvalidParameterError("Parameter plaintext must be a bytes object.")
+            raise HTypeError("plaintext", plaintext, bytes)
 
         if not self._key:
-            raise NotExistKeyError("Please provide key before calling encrypt()")
+            raise KeyError("Please provide key before calling encrypt()")
 
         if self._aes is None:
-            raise NotEnoughCipherParameterError("Please set iv value "
+            raise CipherParameterError("Please set iv value "
             "before calling encrypt().")
 
         if self._in_process is CipherProcess.NONE:
@@ -325,7 +331,7 @@ class AES_CBC(HKSCipher):
             self._padder = self._pkcs7.padder()
 
         if self._in_process is not CipherProcess.ENCRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
             "before calling decrypt().".format(self._in_process.name))
 
         text = self._padder.update(plaintext)
@@ -338,14 +344,13 @@ class AES_CBC(HKSCipher):
 
     def decrypt(self, ciphertext: bytes, finalize=True) -> bytes:
         if not isinstance(ciphertext, bytes):
-            raise InvalidParameterError("Parameter ciphertext must "
-            "be a bytes object.")
+            raise HTypeError("ciphertext", ciphertext, bytes)
 
         if not self._key:
-            raise NotExistKeyError("Please provide key before calling decrypt()")
+            raise KeyError("Please provide key before calling decrypt()")
 
         if self._aes is None:
-            raise NotEnoughCipherParameterError("Please set iv value "
+            raise CipherParameterError("Please set iv value "
             "before calling decrypt().")
 
         if self._in_process is CipherProcess.NONE:
@@ -354,7 +359,7 @@ class AES_CBC(HKSCipher):
             self._unpadder = self._pkcs7.unpadder()
 
         if self._in_process is not CipherProcess.DECRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
             "before calling decrypt().".format(self._in_process.name))
 
         padded_text = self._decryptor.update(ciphertext)
@@ -367,7 +372,7 @@ class AES_CBC(HKSCipher):
 
     def finalize(self) -> bytes:
         if self._aes is None:
-            raise NotFinalizeCipherError("Please set nonce value "
+            raise FinalizeCipherError("Please set nonce value "
             "before calling finalize().")
 
         if self._in_process is CipherProcess.ENCRYPT:
@@ -387,22 +392,22 @@ class AES_CBC(HKSCipher):
             self._unpadder = None
 
         elif self._in_process is CipherProcess.FINALIZED:
-            raise NotResetCipherError("Unknown process in your object "
+            raise ResetError("Unknown process in your object "
             "({}).".format(self._in_process.name))
         else:
-            raise UnknownHKSError("Unknown process ({}).".format(self._in_process.name))
+            raise SymmetricError("Unknown process ({}).".format(self._in_process.name))
 
         self._in_process = CipherProcess.FINALIZED
         return finaltext
 
     def set_param(self, index: int, param: bytes) -> None:
         if not isinstance(param, bytes):
-            raise InvalidCipherParameterError("Parameters of AES "
+            raise CipherParameterError("Parameters of AES "
             "must be a bytes object.")
 
         if index == 0:
             if len(param) * 8 != algorithms.AES.block_size:
-                raise InvalidCipherParameterError("Invalid length of "
+                raise CipherParameterError("Invalid length of "
                 "IV value ({} bits), expected {} bits.".format(
                         len(param) * 8,
                         algorithms.AES.block_size
@@ -416,19 +421,19 @@ class AES_CBC(HKSCipher):
                 default_backend()
             )
         else:
-            raise InvalidCipherParameterError("AES CBC only use the "
+            raise CipherParameterError("AES CBC only use the "
             "IV value as its parameter.")
 
     def get_param(self, index) -> bytes:
         if index == 0:
             return self._iv
         else:
-            raise InvalidCipherParameterError("AES CBC only use the "
+            raise CipherParameterError("AES CBC only use the "
             "IV value as its parameter.")
 
     def reset(self, auto_renew_params: bool = True):
         if self._in_process not in (CipherProcess.NONE, CipherProcess.FINALIZED):
-            raise NotFinalizeCipherError("Please finalize() the "
+            raise FinalizeCipherError("Please finalize() the "
             "process before calling reset().")
 
         if auto_renew_params:
@@ -457,7 +462,7 @@ class HybridCipher(HKSCipher):
 
     def encrypt(self, plaintext: bytes, finalize=True) -> bytes:
         if not isinstance(plaintext, bytes):
-            raise InvalidParameterError("Parameter plaintext must be a bytes object.")
+            raise HTypeError("plaintext", plaintext, bytes)
 
         # ciphertext = E(plaintext + hash(plaintext))
         if self._in_process is CipherProcess.NONE:
@@ -477,14 +482,14 @@ class HybridCipher(HKSCipher):
 
     def decrypt(self, ciphertext: bytes, finalize=True) -> bytes:
         if not isinstance(ciphertext, bytes):
-            raise InvalidParameterError("Parameter ciphertext must be a bytes object.")
+            raise HTypeError("ciphertext", ciphertext, bytes)
 
         if self._in_process is CipherProcess.NONE:
             self._in_process = CipherProcess.DECRYPT
             self._stored_digest = b""
 
         if self._in_process is not CipherProcess.DECRYPT:
-            raise NotResetCipherError("You are in {} process, please call reset() "
+            raise ResetError("You are in {} process, please call reset() "
             "before calling decrypt()".format(self._in_process.name))
         
         plaintext = self._cipher.decrypt(ciphertext, finalize=False)
@@ -527,10 +532,10 @@ class HybridCipher(HKSCipher):
             self._stored_digest = None
         
         elif self._in_process is CipherProcess.FINALIZED:
-            raise NotResetCipherError("Unknown process in your object "
+            raise ResetError("Unknown process in your object "
             "({}).".format(self._in_process.name))
         else:
-            raise UnknownHKSError("Unknown process ({}).".format(self._in_process.name))
+            raise SymmetricError("Unknown process ({}).".format(self._in_process.name))
         
             
         self._in_process = CipherProcess.FINALIZED

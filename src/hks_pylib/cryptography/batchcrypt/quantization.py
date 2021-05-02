@@ -1,6 +1,6 @@
+from hkserror.hkserror import HFormatError, HTypeError
 from hks_pylib.math import Bitwise
 
-from hks_pylib.errors import InvalidParameterError
 from hks_pylib.errors.cryptography.batchcrypt.quantization import *
 
 
@@ -14,22 +14,22 @@ class Quantizer(object):
     
     def set_float_range(self, min_value: float, max_value: float):
         if not isinstance(min_value, float):
-            raise InvalidParameterError("Parameter min_value must be a float.")
+            raise HTypeError("min_value", min_value, float)
 
         if not isinstance(max_value, float):
-            raise InvalidParameterError("Parameter max_value must be a float.")
+            raise HTypeError("max_value", max_value, float)
 
         if min_value >= max_value:
-            raise InvalidParameterError("Parameter min_value must be less than max_value.")
+            raise HFormatError("Parameter min_value must be less than max_value.")
 
         self.__float_range = (min_value, max_value)
 
     def set_int_size(self, size_in_bit: int, signed: bool = False):
         if not isinstance(size_in_bit, int):
-            raise InvalidParameterError("Parameter size_in_bit must be an int.")
+            raise HTypeError("size_in_bit", size_in_bit, int)
 
         if size_in_bit <= 0:
-            raise InvalidParameterError("Parameter size_in_bit must be an "
+            raise HFormatError("Parameter size_in_bit must be an "
             "positive number.")
 
         if not signed:
@@ -44,11 +44,11 @@ class Quantizer(object):
 
     def compile(self):
         if self.__int_range is None:
-            raise NotSetRangeOfQuantizerError("Please set "
+            raise RangeOfQuantizerError("Please set "
             "int size before calling compile().")
         
         if self.__float_range is None:
-            raise NotSetRangeOfQuantizerError("Please set "
+            raise RangeOfQuantizerError("Please set "
             "float range before calling compile().")
 
         maxi, mini = self.__int_range
@@ -58,10 +58,10 @@ class Quantizer(object):
 
     def f2i(self, f: float, force: bool = False):
         if not isinstance(f, float):
-            raise InvalidParameterError("Parameter f must be a float.")
+            raise HTypeError("f", f, float)
         
         if self.__offset is None or self.__scale is None:
-            raise NotCompileQuatizerError("Please calling compile() before.")
+            raise QuantizerError("Please calling compile() before.")
 
         if not force and\
             (f < self.__float_range[0] or f > self.__float_range[1]):
@@ -75,14 +75,16 @@ class Quantizer(object):
 
     def i2f(self, i: int, force: bool = False, n_cumulative: int = 1):
         if not isinstance(i, int):
-            raise InvalidParameterError("Parameter i must be an int.")
+            raise HTypeError("i", i, int)
         
-        if not isinstance(n_cumulative, int) or n_cumulative < 1:
-            raise InvalidParameterError("Parameter n_cummulative must be"
-                "a int and greater than 0.")
+        if not isinstance(n_cumulative, int):
+            raise HTypeError("n_cummulative", n_cumulative, int)
+        
+        if n_cumulative < 1:
+            raise HFormatError("Parameter n_cummulative expected an positive integer.")
         
         if self.__offset is None or self.__scale is None:
-            raise NotCompileQuatizerError("Please calling compile() before.")
+            raise QuantizerError("Please calling compile() before.")
 
         i = i - (n_cumulative - 1) * self.__offset
 

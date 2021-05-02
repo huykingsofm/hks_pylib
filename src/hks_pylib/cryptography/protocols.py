@@ -3,8 +3,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from cryptography.hazmat.primitives.asymmetric import dh
 
-from hks_pylib.errors import InvalidParameterError
-from hks_pylib.errors.cryptography.protocols import NotResetProtocolError
+from hkserror import HTypeError
+from hks_pylib.errors.cryptography import ResetError
 
 
 class DiffieHellmanExchange(object):
@@ -13,10 +13,10 @@ class DiffieHellmanExchange(object):
 
     def __init__(self, p: int = None, g: int = None) -> None:
         if p is not None and not isinstance(p, int):
-            raise InvalidParameterError("Parameter p must be None or an int object.")
+            raise HTypeError("p", p, int, None)
         
         if g is not None and not isinstance(g, int):
-            raise InvalidParameterError("Parameter g must be None or an int object.")
+            raise HTypeError("g", g, int, None)
 
         if not p:
             p = DiffieHellmanExchange.DEFAULT_P
@@ -36,10 +36,10 @@ class DiffieHellmanExchange(object):
 
     def exchange(self, public_key: dh.DHPublicKey) -> bytes:
         if not isinstance(public_key, dh.DHPublicKey):
-            raise InvalidParameterError("Parameter public key must be a DHPublicKey object.")
+            raise HTypeError("public_key", public_key, dh.DHPublicKey)
 
         if self.__private_key is None:
-            raise NotResetProtocolError("You must call reset() the DHE before call exchange().")
+            raise ResetError("The reset() must be called before calling exchange().")
 
         common_key = self.__private_key.exchange(public_key)
         self.__private_key = None
@@ -51,10 +51,10 @@ class DiffieHellmanExchange(object):
     @staticmethod
     def derive_key(shared_key: bytes, key_size: int) -> bytes:
         if not isinstance(shared_key, bytes):
-            raise InvalidParameterError("Parameter shared_key must be a bytes object.")
+            raise HTypeError("shared_key", shared_key, bytes)
 
         if not isinstance(key_size, int):
-            raise InvalidParameterError("Parameter key_size must be an int.")
+            raise HTypeError("key_size", key_size, int)
 
         return HKDF(
             algorithm=hashes.SHA256(),
