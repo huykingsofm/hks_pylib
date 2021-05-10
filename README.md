@@ -1,11 +1,12 @@
 # hks_pylib
 A Python 3 utility library of [huykingsofm](https://github.com/huykingsofm). It has some modules, including:
 - `logger`: A module is used to print notifications to the console screen or write logs to file. It is special because you can disable the print/write statement by modifying a few parameters without commenting or deleting them manually. 
-- `cryptography`: A wrapper crypto module bases on and is followed by the implementation style of [cryptography](https://pypi.org/project/cryptography/). It is easier to use than the original one and fits many functions in our projects.
+- `cryptography`: A wrapper crypto module bases on and is followed by the implementation style of [cryptography](https://pypi.org/project/cryptography/). It is easier to use than the original one and fits many procedures in our projects.
 - `done`: A module defines a class (`Done`) for returning complex values more conveniently.
 - `http`: A module is used to parse or generate raw HTTP packets.
 - `math`: A module implements some no-builtin mathematic operations.
 - `hksenum`: A wrapper module of `Enum` is more convenient than the original.
+- `files`: A file processing module.
 
 # How to build
 Our library is only supported by Python>=3.7.1. Now we test it only on Python 3.7.1. If you meet any problems, even if with other versions, you could [create an issue](https://github.com/huykingsofm/hks_pylib/issues) to notify us. We will solve them as quickly as possible.  
@@ -61,14 +62,14 @@ from hks_pylib.logger import StandardLoggerGenerator
 
 # You may use our console_output instead of print builtin function
 # in a multithread program
-from hks_pylib.logger import console_output
-console_output.write("Something", auto_avoid_conflicting = True)
+from hks_pylib.logger import acprint
+acprint("Something")
 
 # Some common ciphers
-from hks_pylib.cipher import NoCipher, AES_CBC, SimpleSSL 
+from hks_pylib.cipher import NoCipher, AES_CBC, HybridCipher 
 
 # You can parse or generate raw HTTP packets with these class
-from hks_pylib.http import HTTPParser, HTTPGenerator  
+from hks_pylib.http import HTTPParser, HTTPPacket  
 
 # You can encrypt or decrypt your data with our cryptography module
 from hks_pylib.cryptography.ciphers.symmetrics import AES_CTR, AES_CBC

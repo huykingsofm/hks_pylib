@@ -169,6 +169,7 @@ class AES_CTR(HKSCipher):
         self._encryptor: CipherContext = None
         self._decryptor: CipherContext = None
         self._in_process: CipherProcess = CipherProcess.NONE
+        self._nonce = None
 
     def encrypt(self, plaintext: bytes, finalize=True) -> bytes:
         if not isinstance(plaintext, bytes):
@@ -288,7 +289,8 @@ class AES_CTR(HKSCipher):
         self._encryptor = None
         self._decryptor = None
         self._in_process = CipherProcess.NONE
-        self.set_param(0, new_nonce)
+        if new_nonce:
+            self.set_param(0, new_nonce)
 
 
 @CipherID.register
@@ -313,6 +315,7 @@ class AES_CBC(HKSCipher):
         self._pkcs7 = padding.PKCS7(128)
         self._padder = None
         self._unpadder = None
+        self._iv = None
 
     def encrypt(self, plaintext: bytes, finalize=True) -> bytes:
         if not isinstance(plaintext, bytes):
@@ -446,7 +449,8 @@ class AES_CBC(HKSCipher):
         self._padder = None
         self._unpadder = None
         self._in_process = CipherProcess.NONE
-        self.set_param(0, new_iv)
+        if new_iv:
+            self.set_param(0, new_iv)
 
 
 @CipherID.register

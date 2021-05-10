@@ -17,3 +17,4 @@ more conveniently.
 """
 
 from hks_pylib.version import __version__
+from hks_pylib.utils import as_object

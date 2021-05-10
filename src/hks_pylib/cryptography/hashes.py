@@ -61,3 +61,8 @@ class SHA256(BuiltinHash):
 class SHA1(BuiltinHash):
     def __init__(self) -> None:
         super().__init__(algorithm=hashes.SHA1())
+
+
+class MD5(BuiltinHash):
+    def __init__(self) -> None:
+        super().__init__(algorithm=hashes.MD5())

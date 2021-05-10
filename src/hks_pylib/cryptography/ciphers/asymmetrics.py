@@ -52,15 +52,12 @@ class RSAKey(object):
         
         self.__public_key = self.__private_key.public_key()
 
-    @property
     def private_key(self) -> rsa.RSAPrivateKeyWithSerialization:
         return self.__private_key
     
-    @property
     def public_key(self) -> rsa.RSAPublicKeyWithSerialization:
         return self.__public_key
 
-    @property
     def key_size(self):
         if not self.__private_key and not self.__public_key:
             raise KeyError("Please import (generate/load/deserialize) "
@@ -100,13 +97,13 @@ class RSAKey(object):
             password=password,
         )
 
-    def save_private_key(self, filename, password: bytes = None):
+    def save_private_key(self, path, password: bytes = None):
         data = self.serialize_private_key(password)
-        with open(filename, "wb") as f:
+        with open(path, "wb") as f:
             f.write(data)
 
-    def load_private_key(self, filename, password: bytes = None):
-        with open(filename, "rb") as key_file:
+    def load_private_key(self, path, password: bytes = None):
+        with open(path, "rb") as key_file:
             self.deserialize_private_key(key_file.read(), password)
 
     def serialize_public_key(self):
@@ -126,13 +123,13 @@ class RSAKey(object):
 
         self.__public_key = _load_public_key(data=data)
 
-    def save_public_key(self, filename):
-        data = self.serialize_private_key()
-        with open(filename, "wb") as f:
+    def save_public_key(self, path):
+        data = self.serialize_public_key()
+        with open(path, "wb") as f:
             f.write(data)
 
-    def load_public_key(self, filename):
-        with open(filename, "rb") as key_file:
+    def load_public_key(self, path):
+        with open(path, "rb") as key_file:
             self.deserialize_public_key(key_file.read())
 
     def save_all(self, directory: str, password: bytes = None):
@@ -144,6 +141,7 @@ class RSAKey(object):
 
 @CipherID.register
 class RSACipher(HKSCipher):
+    "RSA Cipher"
     def __init__(self,
                 key: RSAKey,
                 hash_algorithm: hashes.HashAlgorithm = hashes.SHA256
@@ -157,7 +155,7 @@ class RSACipher(HKSCipher):
 
         self._in_process: CipherProcess = CipherProcess.NONE
 
-        self._keysize = ceil_div(self._key.key_size, 8)
+        self._keysize = ceil_div(self._key.key_size(), 8)
 
         # cryptography.rsa only accepts a small enough size of plaintext.
         # I refered the Maarten Bodewes's answer in the topic at
@@ -167,7 +165,7 @@ class RSACipher(HKSCipher):
         self._data = None
 
     def _raw_encrypt(self, plaintext: bytes):
-        ciphertext = self._key.public_key.encrypt(
+        ciphertext = self._key.public_key().encrypt(
                 plaintext,
                 padding.OAEP(
                         mgf=padding.MGF1(self._hash_algorithm()),
@@ -178,7 +176,7 @@ class RSACipher(HKSCipher):
         return ciphertext
 
     def _raw_decrypt(self, ciphertext: bytes):
-        plaintext = self._key.private_key.decrypt(
+        plaintext = self._key.private_key().decrypt(
             ciphertext,
             padding.OAEP(
                 mgf=padding.MGF1(algorithm=self._hash_algorithm()),

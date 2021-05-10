@@ -1,9 +1,19 @@
 # Change log
+## Version 0.0.7
++ Fix the error of `InvisibleLogger`.
++ Fix `reset()` in `AES_CTR` and `AES_CBC`.
++ Fix `save...()` and `load...()` in `RSAKey`.
++ Add the `acprint(.)` for avoid conflicting print.
++ Add `@as_object` decorator.
++ Add `MD5` to `hashes`.
++ Add `KeyGenerator` to `ciphers`.
+
+
 ## Version 0.0.6
 + Change .gitignore to template of Python.
 + Change the `http` style.
 + Change the `logger` to `HKSEnum` style.
-+ Add `InvisibleLoggerGenerator`, `InvisibleLogger` for some convenient.
++ Add `InvisibleLoggerGenerator`, `InvisibleLogger` for more convenient.
 + Add some utility methods to `HKSEnum` and `Done`.
 + Change many error types and replace some errors to `hkserror`.
 <!---Commit at 02/05/2021 8:00:00-->

@@ -41,8 +41,8 @@ class StandardLoggerGenerator(LoggerGenerator):
 
 
 class InvisibleLoggerGenerator(LoggerGenerator):
-    def __init__(self,) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(logger_cls=InvisibleLogger)
 
     def generate(self, name, display):
-        return super().generate(name)
+        return super().generate(name, display)

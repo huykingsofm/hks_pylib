@@ -112,6 +112,9 @@ class StandardLogger(BaseLogger):
 
 
 class InvisibleLogger(BaseLogger):
-    def __init__(self):
+    def __init__(self, name: str, display: Dict[Users, Levels], *args, **kwargs):
         config = LogConfig()
         super().__init__(None, config, {})
+
+    def __call__(self, user: Users, level: Levels, *values, **kwargs):
+        return

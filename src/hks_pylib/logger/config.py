@@ -60,8 +60,11 @@ class ConsoleOutput(Output):
         if must_closed:
             self.close()
 
+
 console_output = ConsoleOutput()
 
+def acprint(*args, **kwargs):
+    console_output.write(*args, **kwargs, auto_avoid_conflicting=True)
 
 class FileOutput(Output):
     def __init__(self, filename: str, mode: str = "at") -> None:
